@@ -1,0 +1,24 @@
+{
+    "manifest_version": 3,
+    "name": "Reddit Like Button Number Changer",
+    "version": "1.0",
+    "author": "Chenchen Mao",
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "Reddit Extension"
+    } , 
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "js": ["content.js"],
+        "matches": ["https://www.reddit.com/*"]
+      }
+    ],
+    "permissions": [
+      "tabs",
+      "alarms"
+    ]
+  }
+  

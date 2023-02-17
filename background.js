@@ -3,6 +3,7 @@ var startDate ;
 var likesDate; 
 var bgDate; 
 var likeschange = false;
+
 // setup alarm
 function setExp()
 {
@@ -11,6 +12,17 @@ function setExp()
     //add 5 seconds
     likesDate = new Date(startDate.getTime() + 5000);
     bgDate = new Date(startDate.getTime() + 10000);
+
+    // start the experiment(listening the upvote and downvote buttons)
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      if (tabs.length === 0) {
+        console.error("No active tabs found");
+        return;
+      }
+    
+      // Send a message to the content script
+      chrome.tabs.sendMessage(tabs[0].id, { message: "listen_buttons" });
+    });
     // change likes number
     chrome.alarms.create("myAlarm", {
         when: likesDate.getTime()
@@ -74,6 +86,7 @@ chrome.runtime.onMessage.addListener(
       }
     }
   );
+
 
 
 

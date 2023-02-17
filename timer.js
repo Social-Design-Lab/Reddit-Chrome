@@ -1,5 +1,6 @@
 
 var time;
+
 document.addEventListener('DOMContentLoaded', function () {
   load();
   document.querySelector('#start').addEventListener('click', startExp);
@@ -52,5 +53,12 @@ function startExp()
   chrome.runtime.sendMessage({ message: "call_function" });
   hide("settings");
   show("display");
- 
+  var uid = (document.getElementById('pid').value);
+  // Get the current active tab
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  // Send the user ID to the content script
+  chrome.tabs.sendMessage(tabs[0].id, {userId: uid});
+});
+
 }
+

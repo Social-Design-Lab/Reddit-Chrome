@@ -12,6 +12,7 @@ function listentobuttons()
       var text = post[0].innerText;
       console.log(`upvote button clicked for post: "${text}"`);
       //senddatatodb(uid,"upvote", text);
+      send_data_to_background(  uid,"upvote", text);
     });
   });
   const downvoteButtons = document.querySelectorAll('[aria-label="downvote"]');
@@ -20,6 +21,7 @@ function listentobuttons()
       var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
       var text = post[0].innerText;
       console.log(`downvote button clicked for post: "${text}"`);
+      send_data_to_background(uid,"downvote", text);
       //senddatatodb(uid,"downvote", text);
     });
   });
@@ -188,4 +190,16 @@ var text ="thisia atets";
 
 senddatatodb(uuid,"upvote", text); */
 
+function send_data_to_background(  id, action, target)
+{
+  // Send data to the background script
+chrome.runtime.sendMessage({
+  message: "data",
+  data: {
+      userid: id,
+      action: action,
+      target_content: target
+  }
+});
 
+}

@@ -121,8 +121,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 //insertdata(2131,"fdf", "fdeefde");
 
-
-var uniquekey = 0;
+////// local database .....
+/* var uniquekey = 0;
 
 const DB_NAME = 'my_database';
 const DB_VERSION = 1;
@@ -190,7 +190,7 @@ function data_export() {
       console.error('Failed to retrieve data:', error);
     };
   };
-}
+} */
 
 // Insert data into the database two times
 //insertdata("user1", "like", "post1");
@@ -199,7 +199,39 @@ function data_export() {
 
 // Print all data two times
 //data_export();
+////// end of local database 
 
+
+///// let's try connect with mongodb database
+
+function insertdata(uid, action, target)
+{
+  fetch("https://redditchrome.herokuapp.com/api/insert", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      user_action: action,
+      target_content:target
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert data");
+    }
+  })
+  .then(data => {
+    console.log("Data inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+  
+}
 
 
 

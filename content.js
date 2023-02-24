@@ -10,6 +10,7 @@ function listentobuttons()
     button.addEventListener('click', () => {
       var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
       var text = post[0].innerText;
+      get_user_id_from_background();
       console.log(`upvote button clicked for post: "${text}"`);
       //senddatatodb(uid,"upvote", text);
       send_data_to_background(  uid,"upvote", text);
@@ -20,6 +21,7 @@ function listentobuttons()
     button.addEventListener('click', () => {
       var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
       var text = post[0].innerText;
+      get_user_id_from_background();
       console.log(`downvote button clicked for post: "${text}"`);
       send_data_to_background(uid,"downvote", text);
       //senddatatodb(uid,"downvote", text);
@@ -27,7 +29,7 @@ function listentobuttons()
   });
 }
 // change number of likes function 
-function changelikes()
+function changelikes(num)
 {
     console.log("change likes has been called");
     
@@ -38,26 +40,44 @@ function changelikes()
         console.log(likeButtons['length'] );
         // For each like button, change the text content to the desired number
         for (let i = 0; i < likeButtons['length']; i++) {
-            likeButtons[i].textContent=100;
+            likeButtons[i].textContent=num;
           }
       
 }
+
 // content.js
 // receive request from background js and call change number likes 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.message === "change_likes") {
-      changelikes();
+      changelikes(100);
       console.log("Received message from the background script for change likes:", request.message);
       
     }
   });
+
+// conditon 2 change number likes 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "change_likes_condtion2") {
+    changelikes(56);
+    console.log("Received message from the background script for change likes:", request.message);
+    
+  }
+});
   
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.message === "change_bgcolor") {
-      changebg();
+      changebg("red");
       console.log("Received message from the background script for change bg colro:", request.message);
       
     }
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "change_bgcolor_condition2") {
+    changebg("green");
+    console.log("Received message from the background script for change bg colro:", request.message);
+    
+  }
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -84,111 +104,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           });
 }); */
 
-function changebg()
+function changebg(bgcl)
 {
     const elements = document.getElementsByClassName("uI_hDmU5GSiudtABRz_37");
 
     for (let i = 0; i < elements.length; i++) {
-        elements[i].style.backgroundColor = "red";
+        elements[i].style.backgroundColor = bgcl;
     }
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.userId) {
-    console.log("Received user ID:", request.userId);
-    uid = request.userId;
-  }
-});
-// the following code use new Fetch API to send data to mongodb however it is too new so the CORS cannot be bypassed. 
-/*  function senddatatodb(uid, action, content) {
-  console.log("database has been called");
-
-  // Data to be sent to the database
-  var data = {
-    database: "reddit",
-    collection: "users",
-    dataSource: "Cluster0",
-    document: {
-      userid: uid,
-      action: action,
-      target_content: content,
-    },
-  };
-
-  // Configuration for the Fetch request
-  var config = {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Request-Headers": "*",
-      "api-key": "mhIkGApzSP3ZbITuH17wjyHwaIaiy2Igg3muuleBiSUoCqb5lg5PpTYR6HoT6gOW",
-    },
-    body: JSON.stringify(data),
-  };
-
-  // Make the HTTP request using Fetch
-  fetch(
-    "https://us-east-1.aws.data.mongodb-api.com/app/data-iycrr/endpoint/data/v1/action/insertOne",
-    config
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Document inserted successfully");
-      console.log(JSON.stringify(data));
-    })
-    .catch((error) => {
-      console.log("Something went wrong");
-      console.log(error);
-    });
-}  */
-// using axios method to post data 
-// it does not work due to Content Security Policy
-/* var script = document.createElement("script");
-script.src = "https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js";
-document.head.appendChild(script);
-function senddatatodb(uid, action, content) {
-  var axios = require('axios');
-
-  var data = JSON.stringify({
-      "database": "reddit",
-      "collection": "users",
-      "dataSource": "Cluster0",
-      "document": 
-          {
-              "userid": uid,
-              "action": action, 
-              "target_content": content
-          }
-
-  });
-
-  var config = {
-      method: 'post',
-      url: 'https://us-east-1.aws.data.mongodb-api.com/app/data-iycrr/endpoint/data/v1/action/insertOne',
-      headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Request-Headers': '*',
-      'api-key': 'mhIkGApzSP3ZbITuH17wjyHwaIaiy2Igg3muuleBiSUoCqb5lg5PpTYR6HoT6gOW',
-      },
-      data: data
-  };
-
-  axios(config)
-      .then(function (response) {
-          console.log("Data inserted successfully");
-          console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-          console.log("Failed to insert data");
-          console.log(error);
-      });
-
-}
-
-var uuid =99999999 ; 
-var text ="thisia atets";
-
-senddatatodb(uuid,"upvote", text); */
 
 function send_data_to_background(  id, action, target)
 {
@@ -199,6 +123,36 @@ chrome.runtime.sendMessage({
       userid: id,
       action: action,
       target_content: target
+  }
+});
+
+}
+
+// alert user the experiment has ended 
+function end_exp_alert()
+{
+  alert("The experiment has ended. Please check the chrome extension for next step.");
+}
+// listen to end of experiment from backend js 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "exp_ended"){
+    // handle the message
+    end_exp_alert();
+    console.log("experiment has ended from content js");
+  }
+});
+
+function get_user_id_from_background()
+{
+  // Send a message to the background script to request the user ID
+chrome.runtime.sendMessage({ message: "get_user_id_frombackground" }, function(response) {
+  // Handle the response from the background script
+  if (response && response.userId) {
+    // Do something with the user ID
+    uid=response.userId;
+    console.log(`Content Received user ID from background: ${response.userId}`);
+  } else {
+    console.log("User ID not found");
   }
 });
 

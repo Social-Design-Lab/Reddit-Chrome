@@ -157,3 +157,63 @@ chrome.runtime.sendMessage({ message: "get_user_id_frombackground" }, function(r
 });
 
 }
+
+
+// set up user makes  new comments 
+function monitor_new_comment()
+{
+const firstSubmitButtons = document.querySelector('button[type="submit"]');
+            //console.log(commentSubmitButton);
+            if (firstSubmitButtons && !firstSubmitButtons.hasEventListener) {
+              firstSubmitButtons.addEventListener('click', function(event) {
+                console.log('Comment submit button clicked!');
+                console.log('My span:', firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                get_user_id_from_background();
+                send_data_to_background(uid,"insert_comment", firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
+              });
+              // Set flag to indicate that event listener has been added
+              firstSubmitButtons.hasEventListener = true;
+            }
+//user insert new comments 
+
+const allButtons = document.querySelectorAll('button._374Hkkigy4E4srsI2WktEd');
+const replyButtons = Array.from(allButtons).filter(button => button.innerText === "Reply");
+
+replyButtons.forEach(replyButton => {
+  replyButton.addEventListener('click', function(event) {
+    console.log('Reply button clicked!');
+    const formContainer = replyButton.parentNode.parentNode.parentNode ;
+    const observer = new MutationObserver((mutationsList, observer) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          // The DOM inside formContainer has changed
+          //console.log('DOM inside formContainer has changed');
+          const commentSubmitButtons = formContainer.querySelector('button[type="submit"]');
+            //console.log(commentSubmitButton);
+            if (commentSubmitButtons && !commentSubmitButtons.hasEventListener) {
+              commentSubmitButtons.addEventListener('click', function(event) {
+                console.log('Comment submit button clicked!');
+                console.log('My span:', commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                get_user_id_from_background();
+                send_data_to_background(uid,"insert_comment", commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
+              });
+              // Set flag to indicate that event listener has been added
+              commentSubmitButtons.hasEventListener = true;
+            }
+        }
+      }
+    });
+    
+    // Start observing the formContainer for changes
+    observer.observe(formContainer, { childList: true, subtree: true });
+  });
+});
+}
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "newcomments_buttons") {
+    monitor_new_comment();
+    console.log("Received message from the background script for listen new comments:", request.message);
+    
+  }
+});

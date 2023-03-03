@@ -20,7 +20,8 @@
       "tabs",
       "alarms",
       "notifications",
-      "activeTab"
+      "activeTab",
+      "identity"
     ],
     "host_permissions": ["https://redditchrome.herokuapp.com/"]
   }

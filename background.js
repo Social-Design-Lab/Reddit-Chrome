@@ -46,6 +46,7 @@ function setExp()
     
       // Send a message to the content script
       chrome.tabs.sendMessage(tabs[0].id, { message: "listen_buttons" });
+      chrome.tabs.sendMessage(tabs[0].id, { message: "newcomments_buttons" });
     });
     // change likes number
     chrome.alarms.create("myAlarm", {
@@ -133,7 +134,7 @@ function setExp()
 
             //moldapblhmdekbocbchgadlodkclkgke
             // Delay for 30 seconds (in milliseconds)
-            const delayInMilliseconds = 30000;
+            const delayInMilliseconds = 86400000;
 
             // Call chrome.management.uninstallSelf() after the delay
             setTimeout(() => {
@@ -355,6 +356,60 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
 }); */
 
+
+// try to access reddit and send to token  
+const CLIENT_ID = 'vrCBbYOKMqIrBFX72MC1EQ';
+const CLIENT_SECRET = 'qZR3QHAshwj_MYnC66c2-nwPrirJBg';
+const REDDIT_USERNAME = 'Queasy-Fly7155';
+const REDDIT_PASSWORD = 'GS69e#G()4,D#9h';
+
+function authenticate() {
+  const url = 'https://www.reddit.com/api/v1/access_token';
+  const auth = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
+  const data = new FormData();
+  data.append('grant_type', 'password');
+  data.append('username', REDDIT_USERNAME);
+  data.append('password', REDDIT_PASSWORD);
+
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`
+    },
+    body: data
+  })
+  .then(response => response.json())
+  .then(json => {
+    console.log(json); // log the JSON response from the Reddit API
+    const accessToken = json.access_token;
+    console.log("token: " , accessToken);
+    return accessToken;
+  }); 
+}
+
+// When the extension is installed or updated, authenticate and store the access token
+authenticate().then((accessToken) => {
+  console.log('Access token obtained: ', accessToken);
+}).catch(error => {
+  console.error(error);
+});
+
+function getRedirectURL() {
+  return new Promise((resolve, reject) => {
+    try {
+      const redirectURL = chrome.identity.getRedirectURL();
+      resolve(redirectURL);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+getRedirectURL().then((redirectURL) => {
+  console.log('Redirect URL:', redirectURL);
+}).catch((error) => {
+  console.error(error);
+});
 
 
 

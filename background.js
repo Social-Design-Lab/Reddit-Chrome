@@ -103,6 +103,7 @@ function setExp()
         }
       });
 
+
    // end of the experiment redirct to the post survey 
       chrome.alarms.create("endAlarm", {
         when: endDate.getTime()
@@ -122,8 +123,8 @@ function setExp()
               chrome.tabs.sendMessage(tabs[0].id, { message: "exp_ended" });
               
             });
-            const newUrl = `https://www.example.com/?userid=${userpid}`;
-            chrome.tabs.create({ url: newUrl });
+            //const newUrl = `https://www.example.com/?userid=${userpid}`;
+            //chrome.tabs.create({ url: newUrl });
             // Set the badge text
             chrome.action.setBadgeText({ text: 'Click' });
 
@@ -136,9 +137,9 @@ function setExp()
             const delayInMilliseconds = 30000;
 
             // Call chrome.management.uninstallSelf() after the delay
-            setTimeout(() => {
-              chrome.management.uninstallSelf();
-            }, delayInMilliseconds);
+            //setTimeout(() => {
+            //  chrome.management.uninstallSelf();
+            //}, delayInMilliseconds);
 
             
 
@@ -235,7 +236,7 @@ function insertdata(uid)
     },
     body: JSON.stringify({
       
-      userid: uid,
+      userid: userpid,
       user_action_onReddit:[],
       browser_history:[]
     })
@@ -265,7 +266,7 @@ function insertUserAction(uid, action, target) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      userid: uid,
+      userid: userpid,
       user_action_onReddit: [{
         action_date: insert_date,
         user_action: action,
@@ -292,7 +293,7 @@ function insertUserAction(uid, action, target) {
 function insertBrowserHistory(uid, browserUrl) {
   const browserDate = new Date();
   const requestBody = {
-    userid: uid,
+    userid: userpid,
     browser_history: [
       {
         browser_date: browserDate,

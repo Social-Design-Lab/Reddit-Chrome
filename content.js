@@ -136,6 +136,8 @@ function end_exp_alert()
 // listen to end of experiment from backend js 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "exp_ended"){
+    send_data_to_background("", "User Scrolling Activity", scrollsArr);
+    scrollsArr = [];
     // handle the message
     end_exp_alert();
     console.log("experiment has ended from content js");
@@ -157,3 +159,26 @@ chrome.runtime.sendMessage({ message: "get_user_id_frombackground" }, function(r
 });
 
 }
+
+var scrollsArr = [], updateEachPixel = window.innerHeight / 2;
+var lastKnownScrollPosition = Math.round(window.scrollY / updateEachPixel);
+window.onscroll = function () {
+    currentScrollPosition = Math.round(window.scrollY / updateEachPixel);
+    if (lastKnownScrollPosition != currentScrollPosition) {
+        console.log(window.scrollY);
+
+        if (lastKnownScrollPosition > currentScrollPosition) {
+            console.log("up");
+            scrollsArr.push("up")
+            //send_data_to_background("", "scroll", "up")
+        } else {
+            console.log("down");
+            scrollsArr.push("down")
+            //send_data_to_background("", "scroll", "down")
+        }
+
+        lastKnownScrollPosition = currentScrollPosition;
+        //send data to database
+    }
+
+};

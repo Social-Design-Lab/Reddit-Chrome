@@ -2,11 +2,31 @@
 var startDate ;
 var likesDate; 
 var bgDate; 
-var likeschange = false;
+let likeschange = false;
 var a = 1;
 var b = 2;
 let endexp =false;
-let userpid ; 
+let userpid ;
+let likeschange1= false;
+let change_bgcolor = false; 
+let change_bgcolor_condition2 = false;
+let allbutton_and_activetime = false;
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if (changeInfo.url) {
+    console.log("The tab URL has changed");
+    if (changeInfo.url.includes("reddit.com")) {
+      if (changeInfo.url.includes("/r/") || changeInfo.url.includes("/comments/")) {
+        console.log("The URL is a post and we want to call content js ");
+        chrome.tabs.sendMessage(tabId, {message: "run_my_code"});
+      } 
+      else {
+      console.log("The URL is the Reddit home page");
+      }
+    }
+  }
+  });
+
 // Listen for messages from the popup script// store uid from index js 
 // Listen for messages from the popup script
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -18,6 +38,20 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   }
 });
 
+//give all setup to content js when the experiment already started and user opened a new tab
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "get_all_setup") {
+  sendResponse({
+
+  likeschange1:likeschange1,
+  likeschange:likeschange,
+  change_bgcolor:change_bgcolor,
+  change_bgcolor_condition2:change_bgcolor_condition2,
+  allbutton_and_activetime:allbutton_and_activetime
+
+  });
+  }
+  });
 
 
 // generate random number between a and b (include a and b) 
@@ -37,6 +71,7 @@ function setExp()
     likesDate = new Date(startDate.getTime() + 5000);
     bgDate = new Date(startDate.getTime() + 10000);
     endDate = new Date(startDate.getTime() + 20000);
+    allbutton_and_activetime=true;
     // start the experiment(listening the upvote and downvote buttons)
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       if (tabs.length === 0) {
@@ -60,15 +95,25 @@ function setExp()
           chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             if (tabs.length === 0) {
               console.error("No active tabs found");
+              if(exp_cond==1) {
+                //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
+                likeschange1 = true;
+              }
+              else{
+                //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
+                likeschange = true;
+              }
               return;
             }
            
             // Send a message to the content script
             if(exp_cond==1) {
               chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
+              likeschange1 = true;
             }
             else{
               chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
+              likeschange = true;
             }
           });
          
@@ -87,16 +132,27 @@ function setExp()
           chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             if (tabs.length === 0) {
               console.error("No active tabs found");
+              if(exp_cond==1) {
+                //chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
+                change_bgcolor =true;
+                }
+                else
+                {
+                 // chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
+                  change_bgcolor_condition2 = true;
+                }
               return;
             }
           
             // Send a message to the content script
             if(exp_cond==1) {
             chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
+            change_bgcolor =true;
             }
             else
             {
               chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
+              change_bgcolor_condition2 = true;
             }
           });
          
@@ -136,16 +192,12 @@ function setExp()
             // Delay for 30 seconds (in milliseconds)
             const delayInMilliseconds = 86400000;
 
+            /////*********** uncomment in the experiment  */
             // Call chrome.management.uninstallSelf() after the delay
-            setTimeout(() => {
+            /* setTimeout(() => {
               chrome.management.uninstallSelf();
             }, delayInMilliseconds);
-
-            
-
-            
-
-          
+ */         
         }
       });     
 
@@ -210,9 +262,9 @@ function openDB() {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "data") {
       console.log("Received data from content script: ", request.data);
-      console.log("userid:" ,request.data.userid );
+      //console.log("userid:" ,request.data.userid );
       //insertdata(request.data.userid,request.data.action, request.data.target_content);
-      insertUserAction(request.data.userid,request.data.action, request.data.target_content );
+      insertUserAction(userpid,request.data.action, request.data.target_content );
       console.log("this is after insertdata function");
       //insertdata(2131,"fdf", "fdeefde");
       //data_export();
@@ -323,6 +375,40 @@ function insertBrowserHistory(uid, browserUrl) {
       console.error(error);
     });
 }
+// insert user active time on Reddit  
+function insertUserActive(uid, total_time) {
+  const viewDate = new Date().toLocaleDateString();
+  const requestBody = {
+    userid: uid,
+    active_onReddit: [
+      {
+        timeOnSite: total_time,
+        timeOnSite_date: viewDate,
+      },
+    ],
+  };
+
+  fetch("https://redditchrome.herokuapp.com/api/updateActiveOnReddit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestBody),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert data");
+      }
+    })
+    .then((data) => {
+      console.log("Data inserted successfully:", data);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
 
 // Listen for messages from the content script and send back userid 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -356,60 +442,28 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
 }); */
 
-
-// try to access reddit and send to token  
-const CLIENT_ID = 'vrCBbYOKMqIrBFX72MC1EQ';
-const CLIENT_SECRET = 'qZR3QHAshwj_MYnC66c2-nwPrirJBg';
-const REDDIT_USERNAME = 'Queasy-Fly7155';
-const REDDIT_PASSWORD = 'GS69e#G()4,D#9h';
-
-function authenticate() {
-  const url = 'https://www.reddit.com/api/v1/access_token';
-  const auth = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
-  const data = new FormData();
-  data.append('grant_type', 'password');
-  data.append('username', REDDIT_USERNAME);
-  data.append('password', REDDIT_PASSWORD);
-
-  return fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${auth}`
-    },
-    body: data
-  })
-  .then(response => response.json())
-  .then(json => {
-    console.log(json); // log the JSON response from the Reddit API
-    const accessToken = json.access_token;
-    console.log("token: " , accessToken);
-    return accessToken;
-  }); 
-}
-
-// When the extension is installed or updated, authenticate and store the access token
-authenticate().then((accessToken) => {
-  console.log('Access token obtained: ', accessToken);
-}).catch(error => {
-  console.error(error);
-});
-
-function getRedirectURL() {
-  return new Promise((resolve, reject) => {
-    try {
-      const redirectURL = chrome.identity.getRedirectURL();
-      resolve(redirectURL);
-    } catch (error) {
-      reject(error);
-    }
+// listen to active time from content js 
+let activetime_start_date =new Date().toLocaleDateString(); 
+//let activetime_start_date =new Date(); 
+//add 5 secondslet record_Date =  new Date(activetime_start_date.getTime() + 20000);
+let activetime =0;
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "active_time") {
+  console.log("Active time: " + request.activeTime );
+  if(activetime_start_date === new Date().toLocaleDateString() )
+  {
+    activetime=activetime+request.activeTime;
+    //insertUserActive(userpid,activetime ); 
+  }
+  else
+  {
+    insertUserActive(userpid,activetime ); 
+    activetime=0; 
+    activetime_start_date =new Date().toLocaleDateString(); 
+    //activetime_start_date =new Date(); 
+  }
+  }
   });
-}
-
-getRedirectURL().then((redirectURL) => {
-  console.log('Redirect URL:', redirectURL);
-}).catch((error) => {
-  console.error(error);
-});
 
 
 

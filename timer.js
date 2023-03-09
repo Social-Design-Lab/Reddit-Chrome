@@ -8,7 +8,17 @@ let uid;
 //let myUrl = `https://www.example.com/?param=${uid}`;
 document.addEventListener('DOMContentLoaded', function () {
   load();
-  document.querySelector('#start').addEventListener('click', startExp);
+  //document.querySelector('#start').addEventListener('click', startExp);
+  document.getElementById("start").addEventListener("click", function() {
+    var participantId = document.getElementById("pid").value;
+    if (participantId === "") {
+      alert("Participant ID is required");
+    } else {
+      // Your code to submit the form
+      startExp();
+    }
+  });
+  
 /*   document.querySelector('#endbutton').addEventListener('click', () => {
     //console.log("endbutton has been clicked");
     //alert("endbutton has been clicked");
@@ -47,11 +57,11 @@ function load()
           hide("display");
           hide("endexp");
           //alert("uid value from background: " + uid);
-          const newUrl = `https://www.example.com/?userid=${uid}`;
+          //const newUrl = `https://www.example.com/?userid=${uid}`;
           // Get a reference to the link element
-          const myLink = document.getElementById("my-link");
+          //const myLink = document.getElementById("my-link");
           // Change the href attribute of the link
-          myLink.setAttribute("href", newUrl);
+          //myLink.setAttribute("href", newUrl);
         
         }
         else 
@@ -66,11 +76,11 @@ function load()
               show("display");
               hide("endexp");
               //alert("uid value from background: " + uid);
-            const newUrl = `https://www.example.com/?userid=${uid}`;
+            //const newUrl = `https://www.example.com/?userid=${uid}`;
               // Get a reference to the link element
-              const myLink = document.getElementById("my-link");
+             // const myLink = document.getElementById("my-link");
               // Change the href attribute of the link
-              myLink.setAttribute("href", newUrl);
+             // myLink.setAttribute("href", newUrl);
 
             }
             else

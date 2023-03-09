@@ -181,4 +181,20 @@ window.onscroll = function () {
         //send data to database
     }
 
+function addVisiblePostsToArray() {
+        const postElements = document.querySelectorAll('div[class*="Post"]');
+        const visiblePosts = [];
+      
+        postElements.forEach((postElement) => {
+          const rect = postElement.getBoundingClientRect();
+          if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+            visiblePosts.push(postElement);
+          }
+        });
+      
+        // Do something with the visiblePosts array
+        console.log(visiblePosts);
+      }
+      window.addEventListener('scroll', addVisiblePostsToArray);
+
 };

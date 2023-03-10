@@ -10,8 +10,38 @@ let active_triggered =false;
   //if (request.message === "run_my_code") {
   //alert(" background calls run my code funtion");
   //alert("from main page to post age");
-  
 
+// this is used for user is on post page and then back to main page
+let homePageObserved = false;
+
+const urlObserver = new MutationObserver(function(mutations) {
+mutations.forEach(function(mutation) {
+if (!homePageObserved && (window.location.href === "https://www.reddit.com/" || window.location.href === "https://www.reddit.com/?feed=home")) {
+console.log("User has navigated to the Reddit home page");
+homePageObserved = true;
+chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
+  
+   
+    if(response.allbutton_and_activetime)
+    {
+      monitor_viewed_post();
+      
+    }
+
+  
+  
+});
+urlObserver.disconnect();
+}
+});
+});
+
+urlObserver.observe(document.body, {
+childList: true,
+subtree: true
+});
+
+// this is used when user is on home page and click the post and then back to home page
   var newobserver = new MutationObserver(function(mutationsList, observer) {
     for (var mutation of mutationsList) {
       if (mutation.type === 'childList') {
@@ -56,9 +86,16 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
     if(response.allbutton_and_activetime)
     {
       console.log("allbutton_and_activetime ");
-      listentobuttons();
-      monitor_new_comment();
-      
+      if (location.hostname === "www.reddit.com" && location.pathname === "/") {
+        alert("This is the Reddit main page.");
+        monitor_viewed_post();
+        
+      } else {
+        alert("This is not the Reddit main page.");
+        monitor_new_comment();
+        listentobuttons();
+      }
+     
       
     }
 
@@ -129,9 +166,16 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
       else{
         user_active_time();
       }
-      listentobuttons();
-      monitor_new_comment();
-      
+      if (location.hostname === "www.reddit.com" && location.pathname === "/") {
+        alert("This is the Reddit main page.");
+        monitor_viewed_post();
+        
+      } else {
+        alert("This is not the Reddit main page.");
+        monitor_new_comment();
+        listentobuttons();
+      }
+     
       
     }
 
@@ -218,11 +262,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     
   }
 });
-
+// this is when the experimenet first start
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "listen_buttons") {
-    listentobuttons();
     user_active_time();
+    if (location.hostname === "www.reddit.com" && location.pathname === "/") {
+      alert("This is the Reddit main page.");
+      monitor_viewed_post();
+      
+    } else {
+      alert("This is not the Reddit main page.");
+      monitor_new_comment();
+      listentobuttons();
+    }
+   
     active_triggered=true;
     console.log("Received message from the background script for listen the button:", request.message);
     
@@ -416,4 +469,64 @@ function timerIncrement() {
     console.log("The user is active");
   }
 }
+}
+
+function monitor_viewed_post() {
+alert("monitor new post is called");
+function isInViewport(el) {
+  var rect = el.getBoundingClientRect();
+
+
+  if (rect.top === 0 && rect.left === 0 && rect.bottom === 0 && rect.right === 0) {
+    return false;
+  } else {
+    
+  
+  var elemTop = rect.top;
+  var elemBottom = rect.bottom;
+
+  // Only completely visible elements return true:
+  var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+  // Partially visible elements return true:
+  //isVisible = elemTop < window.innerHeight && elemBottom >= 0;
+  return isVisible;
+  }
+}
+
+let elements = document.querySelectorAll('._1RYN-7H8gYctjOQeL8p2Q7');
+let filteredElements = Array.from(elements).filter(element => !element.classList.contains("promotedlink"));
+
+const post_observer = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    elements = document.querySelectorAll('._1RYN-7H8gYctjOQeL8p2Q7');
+    filteredElements = Array.from(elements).filter(element => !element.classList.contains("promotedlink"));
+    
+  });
+});
+
+post_observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+//const viewedPosts = new Set();
+const viewedPosts = new Set();
+for (let i = 0; i < filteredElements.length; i++) {
+  console.log("this is first time :" ,filteredElements[i]);
+} 
+window.addEventListener("scroll", function() {
+  for (let i = 0; i < filteredElements.length; i++) {
+    //console.log("is the element in viewport:",  isInViewport(filteredElements[i]));
+    //console.log("index number: ", i+1);
+
+    if (isInViewport(filteredElements[i])) {
+      const post_url = filteredElements[i].querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
+      if (!viewedPosts.has(post_url)) {
+        //console.log(filteredElements[i].getBoundingClientRect());
+        console.log("The href of the post", post_url);
+        send_data_to_background("viewed_post", post_url);
+        viewedPosts.add(post_url);
+      }
+    }
+  }
+});
 }

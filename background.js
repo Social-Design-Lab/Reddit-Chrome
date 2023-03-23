@@ -11,6 +11,69 @@ let likeschange1= false;
 let change_bgcolor = false; 
 let change_bgcolor_condition2 = false;
 let allbutton_and_activetime = false;
+// get the userpid from local storage 
+chrome.storage.local.get(
+  [
+    'userpid',
+    'likeschange',
+    'likeschange1',
+    'change_bgcolor',
+    'change_bgcolor_condition2',
+    'allbutton_and_activetime'
+  ],
+  function (result) {
+    if (result.userpid === null || result.userpid === undefined) {
+      console.log('userpid has not been stored yet');
+    } else {
+      userpid = result.userpid;
+    }
+
+    if (result.likeschange === null || result.likeschange === undefined) {
+      console.log('likeschange has not been stored yet');
+    } else {
+      likeschange = result.likeschange;
+    }
+
+    if (result.likeschange1 === null || result.likeschange1 === undefined) {
+      console.log('likeschange1 has not been stored yet');
+    } else {
+      likeschange1 = result.likeschange1;
+    }
+
+    if (
+      result.change_bgcolor === null ||
+      result.change_bgcolor === undefined
+    ) {
+      console.log('change_bgcolor has not been stored yet');
+    } else {
+      change_bgcolor = result.change_bgcolor;
+    }
+
+    if (
+      result.change_bgcolor_condition2 === null ||
+      result.change_bgcolor_condition2 === undefined
+    ) {
+      console.log('change_bgcolor_condition2 has not been stored yet');
+    } else {
+      change_bgcolor_condition2 = result.change_bgcolor_condition2;
+    }
+
+    if (
+      result.allbutton_and_activetime === null ||
+      result.allbutton_and_activetime === undefined
+    ) {
+      console.log('allbutton_and_activetime has not been stored yet');
+    } else {
+      allbutton_and_activetime = result.allbutton_and_activetime;
+    }
+  }
+);
+
+
+
+//// end of retrie data 
+
+
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo.url) {
@@ -33,6 +96,13 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.message === "send_userid_from_timerjs" && message.userId) {
     // Do something with the user ID
     userpid = message.userId;
+
+    // store the userpid on local so it does not disappear later
+    chrome.storage.local.set({ userpid: userpid }, function() {
+      console.log('userpid stored successfully.');
+    });
+    
+
     insertdata(userpid);
     console.log(`Background Received user ID from timer js: ${message.userId}`);
   }
@@ -72,6 +142,11 @@ function setExp()
     bgDate = new Date(startDate.getTime() + 10000);
     endDate = new Date(startDate.getTime() + 20000);
     allbutton_and_activetime=true;
+
+    chrome.storage.local.set({ allbutton_and_activetime: allbutton_and_activetime }, function() {
+      console.log('allbutton_and_activetime stored successfully.');
+    });
+    
     // start the experiment(listening the upvote and downvote buttons)
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       if (tabs.length === 0) {
@@ -98,10 +173,16 @@ function setExp()
               if(exp_cond==1) {
                 //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
                 likeschange1 = true;
+                chrome.storage.local.set({ likeschange1: likeschange1 }, function() {
+                  console.log('likeschange1 stored successfully.');
+                });
               }
               else{
                 //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
                 likeschange = true;
+                chrome.storage.local.set({ likeschange: likeschange }, function() {
+                  console.log('likeschange stored successfully.');
+                });
               }
               return;
             }
@@ -110,10 +191,17 @@ function setExp()
             if(exp_cond==1) {
               chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
               likeschange1 = true;
+              chrome.storage.local.set({ likeschange1: likeschange1 }, function() {
+                console.log('likeschange1 stored successfully.');
+              });
+
             }
             else{
               chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
               likeschange = true;
+              chrome.storage.local.set({ likeschange: likeschange }, function() {
+                console.log('likeschange stored successfully.');
+              });
             }
           });
          
@@ -135,11 +223,17 @@ function setExp()
               if(exp_cond==1) {
                 //chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
                 change_bgcolor =true;
+                chrome.storage.local.set({ change_bgcolor: change_bgcolor }, function() {
+                  console.log('change_bgcolor stored successfully.');
+                });
                 }
                 else
                 {
                  // chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
                   change_bgcolor_condition2 = true;
+                  chrome.storage.local.set({ change_bgcolor_condition2: change_bgcolor_condition2 }, function() {
+                    console.log('change_bgcolor_condition2 stored successfully.');
+                  });
                 }
               return;
             }
@@ -148,11 +242,18 @@ function setExp()
             if(exp_cond==1) {
             chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
             change_bgcolor =true;
+            chrome.storage.local.set({ change_bgcolor: change_bgcolor }, function() {
+              console.log('change_bgcolor stored successfully.');
+            });
+            
             }
             else
             {
               chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
               change_bgcolor_condition2 = true;
+              chrome.storage.local.set({ change_bgcolor_condition2: change_bgcolor_condition2 }, function() {
+                console.log('change_bgcolor_condition2 stored successfully.');
+              });
             }
           });
          

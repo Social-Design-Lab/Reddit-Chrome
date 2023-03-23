@@ -13,11 +13,11 @@ let active_triggered =false;
 
 // this is used for user is on post page and then back to main page
 let homePageObserved = false;
-
+const redditBaseUrl = "https://www.reddit.com/";
 const urlObserver = new MutationObserver(function(mutations) {
 mutations.forEach(function(mutation) {
 if (!homePageObserved && (window.location.href === "https://www.reddit.com/" || window.location.href === "https://www.reddit.com/?feed=home")) {
-console.log("User has navigated to the Reddit home page");
+alert("User has navigated to the Reddit home page");
 homePageObserved = true;
 chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
   
@@ -93,7 +93,9 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
       } else {
         alert("This is not the Reddit main page.");
         monitor_new_comment();
+        insert_comment();
         listentobuttons();
+        
       }
      
       
@@ -173,7 +175,9 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
       } else {
         alert("This is not the Reddit main page.");
         monitor_new_comment();
+        insert_comment();
         listentobuttons();
+        
       }
      
       
@@ -194,9 +198,20 @@ function listentobuttons()
       var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
       var text = post[0].innerText;
       //var uid = get_user_id_from_background();
+      if (text=='')
+      {
+        const currentUrl = window.location.href;
+        console.log(`downvote button clicked for post: "${currentUrl}"`);
+        send_data_to_background("downvote", currentUrl);
+      }
+      //var uid = get_user_id_from_background();
+      
+      else
+      {
       console.log(`upvote button clicked for post: "${text}"`);
       //senddatatodb(uid,"upvote", text);
       send_data_to_background( "upvote", text);
+      }
     });
   });
   const downvoteButtons = document.querySelectorAll('[aria-label="downvote"]');
@@ -204,12 +219,26 @@ function listentobuttons()
     button.addEventListener('click', () => {
       var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
       var text = post[0].innerText;
+      if (text=='')
+      {
+        const currentUrl = window.location.href;
+        console.log(`downvote button clicked for post: "${currentUrl}"`);
+        send_data_to_background("downvote", currentUrl);
+      }
       //var uid = get_user_id_from_background();
-      console.log(`downvote button clicked for post: "${text}"`);
-      send_data_to_background("downvote", text);
+      
+      else
+      {
+        console.log(`downvote button clicked for post: "${text}"`);
+        send_data_to_background("downvote", text);
+      }
       //senddatatodb(uid,"downvote", text);
     });
   });
+
+ 
+
+
 }
 // change number of likes function 
 function changelikes(num)
@@ -273,7 +302,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else {
       alert("This is not the Reddit main page.");
       monitor_new_comment();
+      insert_comment();
       listentobuttons();
+      
     }
    
     active_triggered=true;
@@ -297,6 +328,40 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
               }
           });
 }); */
+
+// fake comments test
+function insert_comment()
+{
+const parentContainer = document.querySelector('div._1YCqQVO-9r-Up6QPB9H6_4');
+const commentDiv = document.querySelector('div.Comment');
+const clonedCommentDiv = commentDiv.cloneNode(true);
+
+const pElement = clonedCommentDiv.querySelector('p');
+const aElement = clonedCommentDiv.querySelector('a.wM6scouPXXsFDSZmZPHRo');
+
+// Change the content of the <p> element
+aElement.textContent = 'COVID19_user';
+
+// Change the content of the <a> element
+pElement.textContent = 'Vaccine is bad for you!!';
+
+// Store the parent of the pElement
+const pElementParent = pElement.parentElement;
+
+// Remove all other <p> elements
+const allPElements = clonedCommentDiv.querySelectorAll('p');
+allPElements.forEach(element => {
+  pElementParent.removeChild(element);
+});
+
+// Append the modified pElement back to the parent
+pElementParent.appendChild(pElement);
+
+
+parentContainer.insertBefore(clonedCommentDiv, parentContainer.children[0]);
+
+}
+
 
 function changebg(bgcl)
 {
@@ -496,11 +561,45 @@ function isInViewport(el) {
 let elements = document.querySelectorAll('._1RYN-7H8gYctjOQeL8p2Q7');
 let filteredElements = Array.from(elements).filter(element => !element.classList.contains("promotedlink"));
 
+  // Function to add event listeners to upvote and downvote buttons
+  function addVoteEventListeners(elements) {
+    elements.forEach((element) => {
+      const upvoteButton = element.querySelector('[aria-label="upvote"]');
+      if (upvoteButton && !upvoteButton.getAttribute("data-listener-attached")) {
+        upvoteButton.addEventListener("click", () => {
+        
+          var text = element.querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
+          const fullUrl = redditBaseUrl + text;
+          console.log(`upvote button clicked for post: "${fullUrl}"`);
+          send_data_to_background("upvote_post", fullUrl);
+        });
+        upvoteButton.setAttribute("data-listener-attached", "true");
+      }
+
+      const downvoteButton = element.querySelector('[aria-label="downvote"]');
+      if (downvoteButton && !downvoteButton.getAttribute("data-listener-attached")) {
+        downvoteButton.addEventListener("click", () => {
+          //var post = downvoteButton.parentNode.parentNode.parentNode.getElementsByClassName("_292iotee39Lmt0MkQZ2hPV");
+          var text = element.querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
+          const fullUrl = redditBaseUrl + text;
+          console.log(`downvote button clicked for post: "${fullUrl}"`);
+          send_data_to_background("downvote_post", fullUrl);
+        });
+        downvoteButton.setAttribute("data-listener-attached", "true");
+      }
+    });
+  }
+
+  // Add event listeners to the initial filtered elements
+  addVoteEventListeners(filteredElements);
+
+  /// end of post vote section 
+
 const post_observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
     elements = document.querySelectorAll('._1RYN-7H8gYctjOQeL8p2Q7');
     filteredElements = Array.from(elements).filter(element => !element.classList.contains("promotedlink"));
-    
+    addVoteEventListeners(filteredElements);
   });
 });
 
@@ -520,11 +619,15 @@ window.addEventListener("scroll", function() {
 
     if (isInViewport(filteredElements[i])) {
       const post_url = filteredElements[i].querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
-      if (!viewedPosts.has(post_url)) {
+      const fullUrl = redditBaseUrl + post_url;
+      if (!viewedPosts.has(fullUrl)) {
         //console.log(filteredElements[i].getBoundingClientRect());
-        console.log("The href of the post", post_url);
-        send_data_to_background("viewed_post", post_url);
-        viewedPosts.add(post_url);
+       //const fullUrl = redditBaseUrl + post_url;
+       
+        console.log("The href of the post", fullUrl);
+        send_data_to_background("viewed_post", fullUrl);
+        viewedPosts.add(fullUrl);
+        //console.log(Array.from(viewedPosts));
       }
     }
   }

@@ -65,7 +65,7 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
     //alert("window on load is called");
     if(response.likeschange1)
     {
-      console.log(" change likes");
+      //console.log(" change likes");
       changelikes(100);
     }
     if(response.likeschange)
@@ -120,6 +120,7 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
  // });
 // this is used to make sure the content js change reddit page when user open a new tab or refresh the page since tabupdate does not work for this
  window.onload = function(){
+
 runMyCode();
 } 
   
@@ -140,13 +141,21 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
     //alert("window on load is called");
     if(response.likeschange1)
     {
-      console.log(" change likes");
+      //console.log(" change likes");
+/*       document.addEventListener('DOMContentLoaded', function() {
+        // Your code here will run when the DOM is fully loaded
+        
+        changelikes(100);
+      }); */
       changelikes(100);
     }
     if(response.likeschange)
     {
       
-
+ /*      document.addEventListener('DOMContentLoaded', function() {
+        // Your code here will run when the DOM is fully loaded
+      }); */
+      
       changelikes(56);
       
     }
@@ -170,7 +179,7 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
       }
       if (location.hostname === "www.reddit.com" && location.pathname === "/") {
         alert("This is the Reddit main page.");
-        monitor_viewed_post();
+        //monitor_viewed_post();
         
       } else {
         alert("This is not the Reddit main page.");
@@ -194,46 +203,53 @@ function listentobuttons()
 {
   const upvoteButtons = document.querySelectorAll('[aria-label="upvote"]');
   upvoteButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
-      var text = post[0].innerText;
-      //var uid = get_user_id_from_background();
-      if (text=='')
-      {
-        const currentUrl = window.location.href;
-        console.log(`downvote button clicked for post: "${currentUrl}"`);
-        send_data_to_background("downvote", currentUrl);
-      }
-      //var uid = get_user_id_from_background();
-      
-      else
-      {
-      console.log(`upvote button clicked for post: "${text}"`);
-      //senddatatodb(uid,"upvote", text);
-      send_data_to_background( "upvote", text);
-      }
-    });
+    if (!button.getAttribute('data-listener-attached')) {
+      button.addEventListener('click', () => {
+        var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
+        var text = post[0].innerText;
+        //var uid = get_user_id_from_background();
+        if (text=='')
+        {
+          const currentUrl = window.location.href;
+          console.log(`downvote button clicked for post: "${currentUrl}"`);
+          send_data_to_background("downvote_post", currentUrl);
+        }
+        //var uid = get_user_id_from_background();
+        
+        else
+        {
+        console.log(`upvote button clicked for post: "${text}"`);
+        //senddatatodb(uid,"upvote", text);
+        send_data_to_background( "upvote_comment", text);
+        }
+      });
+      button.setAttribute('data-listener-attached', 'true');
+    }
   });
   const downvoteButtons = document.querySelectorAll('[aria-label="downvote"]');
   downvoteButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
-      var text = post[0].innerText;
-      if (text=='')
-      {
-        const currentUrl = window.location.href;
-        console.log(`downvote button clicked for post: "${currentUrl}"`);
-        send_data_to_background("downvote", currentUrl);
-      }
-      //var uid = get_user_id_from_background();
-      
-      else
-      {
-        console.log(`downvote button clicked for post: "${text}"`);
-        send_data_to_background("downvote", text);
-      }
+    if (!button.getAttribute('data-listener-attached')) {
+      button.addEventListener('click', () => {
+        var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
+        var text = post[0].innerText;
+        if (text=='')
+        {
+          const currentUrl = window.location.href;
+          console.log(`downvote button clicked for post: "${currentUrl}"`);
+          send_data_to_background("downvote_post", currentUrl);
+        }
+        //var uid = get_user_id_from_background();
+        
+        else
+        {
+          console.log(`downvote button clicked for post: "${text}"`);
+          send_data_to_background("downvote_comment", text);
+        }
       //senddatatodb(uid,"downvote", text);
-    });
+
+      });
+      button.setAttribute('data-listener-attached', 'true');
+    }
   });
 
  
@@ -243,17 +259,21 @@ function listentobuttons()
 // change number of likes function 
 function changelikes(num)
 {
-    console.log("change likes has been called");
+    //console.log("change likes has been called");
+   
+      // Your code here will run when the DOM is fully loaded
+   
     
         // Select all elements with the class "_1rZYMD_4xjzK" (which represents the like button)
         const likeButtons = document.getElementsByClassName("_1rZYMD_4xY3gRcSS3p8ODO _25IkBM0rRUqWX5ZojEMAFQ _3ChHiOyYyUkpZ_Nm3ZyM2M");
     
-        console.log("print out likebuttons length: ");
-        console.log(likeButtons['length'] );
+        //console.log("print out likebuttons length: ");
+        //console.log(likeButtons['length'] );
         // For each like button, change the text content to the desired number
         for (let i = 0; i < likeButtons['length']; i++) {
             likeButtons[i].textContent=num;
           }
+   
       
 }
 
@@ -423,11 +443,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function monitor_new_comment()
 {
   //_3MknXZVbkWU8JL9XGlzASi
-  console.log("monitor_new_comment is called");
+  //console.log("monitor_new_comment is called");
   
   const div = document.querySelector('._3MknXZVbkWU8JL9XGlzASi');
 const firstSubmitButtons = div.querySelector('button');
-console.log("top submit comments: " ,firstSubmitButtons);
+//console.log("top submit comments: " ,firstSubmitButtons);
 //const firstSubmitButtons = document.querySelector('button[type="submit"]');
             //console.log(commentSubmitButton);
             if (firstSubmitButtons && !firstSubmitButtons.hasEventListener) {
@@ -435,7 +455,7 @@ console.log("top submit comments: " ,firstSubmitButtons);
                 console.log('Comment submit button clicked!');
                 console.log('My span:', firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
                 //var uid =get_user_id_from_background();
-
+                const post_link =  location.hostname; 
                 send_data_to_background("insert_comment", firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
               });
               // Set flag to indicate that event listener has been added
@@ -447,33 +467,39 @@ const allButtons = document.querySelectorAll('button._374Hkkigy4E4srsI2WktEd');
 const replyButtons = Array.from(allButtons).filter(button => button.innerText === "Reply");
 
 replyButtons.forEach(replyButton => {
-  replyButton.addEventListener('click', function(event) {
-    console.log('Reply button clicked!');
-    const formContainer = replyButton.parentNode.parentNode.parentNode ;
-    const observer = new MutationObserver((mutationsList, observer) => {
-      for (const mutation of mutationsList) {
-        if (mutation.type === 'childList') {
-          // The DOM inside formContainer has changed
-          //console.log('DOM inside formContainer has changed');
-          const commentSubmitButtons = formContainer.querySelector('button[type="submit"]');
-            //console.log(commentSubmitButton);
-            if (commentSubmitButtons && !commentSubmitButtons.hasEventListener) {
-              commentSubmitButtons.addEventListener('click', function(event) {
-                console.log('Comment submit button clicked!');
-                console.log('My span:', commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
-                //var uid =get_user_id_from_background();
-                send_data_to_background("insert_comment", commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
-              });
-              // Set flag to indicate that event listener has been added
-              commentSubmitButtons.hasEventListener = true;
+  if (replyButton && !replyButton.hasEventListener) 
+  {
+      replyButton.addEventListener('click', function(event) {
+        console.log('Reply button clicked!');
+        const formContainer = replyButton.parentNode.parentNode.parentNode ;
+        const observer = new MutationObserver((mutationsList, observer) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+              // The DOM inside formContainer has changed
+              //console.log('DOM inside formContainer has changed');
+              const commentSubmitButtons = formContainer.querySelector('button[type="submit"]');
+                //console.log(commentSubmitButton);
+                if (commentSubmitButtons && !commentSubmitButtons.hasEventListener) {
+                  commentSubmitButtons.addEventListener('click', function(event) {
+                    console.log('Comment submit button clicked!');
+                    console.log('My span:', commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                    const reply_to = commentSubmitButtons.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV')[0].innerText;
+                    const post_link =  location.hostname; 
+                    //var uid =get_user_id_from_background();
+                    send_data_to_background("insert_comment", commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                  });
+                  // Set flag to indicate that event listener has been added
+                  commentSubmitButtons.hasEventListener = true;
+                }
             }
-        }
-      }
-    });
-    
-    // Start observing the formContainer for changes
-    observer.observe(formContainer, { childList: true, subtree: true });
-  });
+          }
+        });
+        
+        // Start observing the formContainer for changes
+        observer.observe(formContainer, { childList: true, subtree: true });
+      });
+      replyButton.hasEventListener = true;
+  }
 });
 }
 
@@ -597,6 +623,7 @@ let filteredElements = Array.from(elements).filter(element => !element.classList
 
 const post_observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
+    //listentobuttons();
     elements = document.querySelectorAll('._1RYN-7H8gYctjOQeL8p2Q7');
     filteredElements = Array.from(elements).filter(element => !element.classList.contains("promotedlink"));
     addVoteEventListeners(filteredElements);
@@ -613,6 +640,7 @@ for (let i = 0; i < filteredElements.length; i++) {
   console.log("this is first time :" ,filteredElements[i]);
 } 
 window.addEventListener("scroll", function() {
+  
   for (let i = 0; i < filteredElements.length; i++) {
     //console.log("is the element in viewport:",  isInViewport(filteredElements[i]));
     //console.log("index number: ", i+1);
@@ -632,4 +660,88 @@ window.addEventListener("scroll", function() {
     }
   }
 });
+}
+
+
+
+// this function is used for only post page(sub reddit page ) when user scroll the page or clicked more reply(new elements added into the DOM)
+function add_all_event()
+{
+  // this funciton is used for update number of likes when user
+  window.addEventListener('scroll', function() {
+    // Your code here will run when the user scrolls the page
+    //changelikes(10);
+    chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
+      if(response.likeschange1)
+      {
+        //console.log(" change likes");
+        changelikes(100);
+      }
+      if(response.likeschange)
+      {
+        
+
+        changelikes(56);
+        
+      }
+      if(response.allbutton_and_activetime)
+      {
+        
+          listentobuttons();
+          monitor_new_comment();
+        
+      }
+    });
+  });
+  // this is used to monitor if any elemenet added into the post page then we want to update the likes and listen button
+  const post_individual_observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach(function(addedNode) {
+          // Check if the added node is an element
+          if (addedNode.nodeType === Node.ELEMENT_NODE) {
+            
+            chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
+              if(response.likeschange1)
+              {
+                //console.log(" change likes");
+                changelikes(100);
+              }
+              if(response.likeschange)
+              {
+                
+          
+                changelikes(56);
+                
+              }
+              if(response.allbutton_and_activetime)
+                {
+                  
+                    listentobuttons();
+                    monitor_new_comment();
+                
+                  
+                }
+            });
+          }
+        });
+      }
+    });
+  });
+
+  // Start observing the entire document
+  post_individual_observer.observe(document, {
+    childList: true,
+    subtree: true
+  });
+}
+// end of the section 
+
+
+if (location.hostname === "www.reddit.com" && location.pathname === "/") {
+  
+  
+} else {
+  add_all_event();
+  
 }

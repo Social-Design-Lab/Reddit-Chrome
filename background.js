@@ -360,19 +360,27 @@ function openDB() {
 
 
 // Listen for messages from the content script for insert data into database 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.message === "data") {
-      console.log("Received data from content script: ", request.data);
-      //console.log("userid:" ,request.data.userid );
-      //insertdata(request.data.userid,request.data.action, request.data.target_content);
-      insertUserAction(userpid,request.data.action, request.data.target_content );
-      console.log("this is after insertdata function");
-      //insertdata(2131,"fdf", "fdeefde");
-      //data_export();
-      // Send a response back to the content script
-      sendResponse({
-          message: "success"
-      });
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.message === "voteComment") {
+    console.log("Received data from content script: ", request.data);
+    insertUserVoteComments(userpid, request.data.action, request.data.comment, request.data.post);
+    sendResponse({ message: "voteCommentSuccess" });
+  } else if (request.message === "replyPost") {
+    console.log("Received data from content script: ", request.data);
+    insertUserReplyPosts(userpid, request.data.content, request.data.post);
+    sendResponse({ message: "replyPostSuccess" });
+  } else if (request.message === "votePost") {
+    console.log("Received data from content script: ", request.data);
+    insertUserVotePosts(userpid, request.data.action, request.data.post);
+    sendResponse({ message: "votePostSuccess" });
+  } else if (request.message === "replyComment") {
+    console.log("Received data from content script: ", request.data);
+    insertUserReplyComments(userpid, request.data.content, request.data.comment, request.data.post);
+    sendResponse({ message: "replyCommentSuccess" });
+  } else if (request.message === "updateViewedPost") {
+    console.log("Received data from content script: ", request.data);
+    updateUserViewedPost(userpid, request.data.post_url);
+    sendResponse({ message: "updateViewedPostSuccess" });
   }
 });
 
@@ -390,8 +398,12 @@ function insertdata(uid)
     body: JSON.stringify({
       
       userid: uid,
-      user_action_onReddit:[],
-      browser_history:[]
+      user_vote_onPosts:[],
+      user_reply_onPosts:[],
+      user_vote_onComments:[],
+      user_reply_onComments:[],
+      browser_history:[],
+      active_onReddit:[]
     })
   })
   .then(response => {
@@ -410,20 +422,21 @@ function insertdata(uid)
   
 }
 
-// insert user action into db
-function insertUserAction(uid, action, target) {
+// insert user vote on Comments 
+function insertUserVoteComments(uid, action, comment, post) {
   const insert_date = new Date();
-  fetch("https://redditchrome.herokuapp.com/api/updateUserAction", {
+  fetch("https://redditchrome.herokuapp.com/api/updateUserVote_Comments", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
       userid: uid,
-      user_action_onReddit: [{
+      user_vote_onComments: [{
         action_date: insert_date,
         user_action: action,
-        action_target: target
+        action_comment: comment, 
+        action_post: post
       }]
     })
   })
@@ -431,16 +444,116 @@ function insertUserAction(uid, action, target) {
     if (response.ok) {
       return response.json();
     } else {
-      throw new Error("Failed to insert user action");
+      throw new Error("Failed to insert user vote on comments ");
     }
   })
   .then(data => {
-    console.log("User action inserted successfully:", data);
+    console.log("User vote on comments inserted successfully:", data);
   })
   .catch(error => {
     console.error(error);
   });
 }
+// update the user action, reply a post
+function insertUserReplyPosts(uid, content, post) {
+  const insert_date = new Date();
+  fetch("https://redditchrome.herokuapp.com/api/updateUserReply_Posts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      user_reply_onPosts: [{
+        action_date: insert_date,
+        reply_content: content,
+        reply_post: post
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert user vote on comments ");
+    }
+  })
+  .then(data => {
+    console.log("User vote on comments inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+
+// insert user vote on post 
+function insertUserVotePosts(uid, action, post) {
+  const insert_date = new Date();
+  fetch("https://redditchrome.herokuapp.com/api/updateUserVote_Posts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      user_vote_onPosts: [{
+        action_date: insert_date,
+        user_action: action,
+        action_post: post
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert user vote on Posts");
+    }
+  })
+  .then(data => {
+    console.log("User vote on posts inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+
+// insert the user action, reply a comments
+function insertUserReplyComments(uid, content,comment, post) {
+  const insert_date = new Date();
+  fetch("https://redditchrome.herokuapp.com/api/updateUserReply_Comments", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      user_reply_onComments: [{
+        action_date: insert_date,
+        reply_content: content,
+        reply_comment: comment,
+        reply_post: post
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert user vote on Posts");
+    }
+  })
+  .then(data => {
+    console.log("User vote on posts inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+
 
 // insert browswer history 
 function insertBrowserHistory(uid, browserUrl) {
@@ -509,6 +622,37 @@ function insertUserActive(uid, total_time) {
     .catch((error) => {
       console.error(error);
     });
+}
+
+function updateUserViewedPost(userid, post_url) {
+  const viewpostDate = new Date();
+
+  fetch("https://redditchrome.herokuapp.com/api/updateViwedPost", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: userid,
+      viewed_posts: [{
+        viewed_date: viewpostDate,
+        post_url: post_url
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to update viewed post");
+    }
+  })
+  .then(data => {
+    console.log("User viewed post updated successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
 }
 
 // Listen for messages from the content script and send back userid 

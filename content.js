@@ -212,7 +212,7 @@ function listentobuttons()
         {
           const currentUrl = window.location.href;
           console.log(`downvote button clicked for post: "${currentUrl}"`);
-          send_data_to_background("downvote_post", currentUrl);
+          send_votePost_to_background("downvote",currentUrl);
         }
         //var uid = get_user_id_from_background();
         
@@ -220,7 +220,7 @@ function listentobuttons()
         {
         console.log(`upvote button clicked for post: "${text}"`);
         //senddatatodb(uid,"upvote", text);
-        send_data_to_background( "upvote_comment", text);
+        send_voteComment_to_background("upvote",text,window.location.href );
         }
       });
       button.setAttribute('data-listener-attached', 'true');
@@ -236,14 +236,15 @@ function listentobuttons()
         {
           const currentUrl = window.location.href;
           console.log(`downvote button clicked for post: "${currentUrl}"`);
-          send_data_to_background("downvote_post", currentUrl);
+          send_votePost_to_background("downvote",currentUrl);
         }
         //var uid = get_user_id_from_background();
         
         else
         {
           console.log(`downvote button clicked for post: "${text}"`);
-          send_data_to_background("downvote_comment", text);
+          //send_data_to_background("downvote_comment", text);
+          send_voteComment_to_background("downvote",text,window.location.href );
         }
       //senddatatodb(uid,"downvote", text);
 
@@ -392,19 +393,50 @@ function changebg(bgcl)
     }
 }
 
-
-function send_data_to_background(  action, target)
-{
-  // Send data to the background script
-chrome.runtime.sendMessage({
-  message: "data",
-  data: {
+/// send user actions to backgroun then send to database section
+function send_voteComment_to_background( action, comment, post) {
+  chrome.runtime.sendMessage({
+    message: "voteComment",
+    data: {
       action: action,
-      target_content: target
-  }
-});
-
+      comment: comment,
+      post: post
+    }
+  });
 }
+
+function send_replyPost_to_background( content, post) {
+  chrome.runtime.sendMessage({
+    message: "replyPost",
+    data: {
+      content: content,
+      post: post
+    }
+  });
+}
+
+function send_votePost_to_background( action, post) {
+  chrome.runtime.sendMessage({
+    message: "votePost",
+    data: {
+      action: action,
+      post: post
+    }
+  });
+}
+
+function send_replyComment_to_background(content, comment, post) {
+  chrome.runtime.sendMessage({
+    message: "replyComment",
+    data: {
+      content: content,
+      comment: comment,
+      post: post
+    }
+  });
+}
+
+/// send of the section 
 
 // alert user the experiment has ended 
 function end_exp_alert()
@@ -455,8 +487,9 @@ const firstSubmitButtons = div.querySelector('button');
                 console.log('Comment submit button clicked!');
                 console.log('My span:', firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
                 //var uid =get_user_id_from_background();
-                const post_link =  location.hostname; 
-                send_data_to_background("insert_comment", firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                const post_link =  window.location.href; 
+                //send_data_to_background("insert_comment", firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                send_replyPost_to_background(firstSubmitButtons.parentNode.parentNode.parentNode.innerText,post_link );
               });
               // Set flag to indicate that event listener has been added
               firstSubmitButtons.hasEventListener = true;
@@ -484,9 +517,10 @@ replyButtons.forEach(replyButton => {
                     console.log('Comment submit button clicked!');
                     console.log('My span:', commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
                     const reply_to = commentSubmitButtons.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV')[0].innerText;
-                    const post_link =  location.hostname; 
+                    const post_link =  window.location.href; 
                     //var uid =get_user_id_from_background();
-                    send_data_to_background("insert_comment", commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                    //send_data_to_background("insert_comment", commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                    send_replyComment_to_background(commentSubmitButtons.parentNode.parentNode.parentNode.innerText,reply_to,window.location.href);
                   });
                   // Set flag to indicate that event listener has been added
                   commentSubmitButtons.hasEventListener = true;
@@ -597,7 +631,8 @@ let filteredElements = Array.from(elements).filter(element => !element.classList
           var text = element.querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
           const fullUrl = redditBaseUrl + text;
           console.log(`upvote button clicked for post: "${fullUrl}"`);
-          send_data_to_background("upvote_post", fullUrl);
+          //send_data_to_background("upvote_post", fullUrl);
+          send_votePost_to_background("upvote",fullUrl);
         });
         upvoteButton.setAttribute("data-listener-attached", "true");
       }
@@ -609,7 +644,8 @@ let filteredElements = Array.from(elements).filter(element => !element.classList
           var text = element.querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
           const fullUrl = redditBaseUrl + text;
           console.log(`downvote button clicked for post: "${fullUrl}"`);
-          send_data_to_background("downvote_post", fullUrl);
+          //send_data_to_background("downvote_post", fullUrl);
+          send_votePost_to_background("downvote",fullUrl)
         });
         downvoteButton.setAttribute("data-listener-attached", "true");
       }
@@ -653,7 +689,8 @@ window.addEventListener("scroll", function() {
        //const fullUrl = redditBaseUrl + post_url;
        
         console.log("The href of the post", fullUrl);
-        send_data_to_background("viewed_post", fullUrl);
+        //send_data_to_background("viewed_post", fullUrl);
+        sendUpdateViewedPostToBackground(fullUrl);
         viewedPosts.add(fullUrl);
         //console.log(Array.from(viewedPosts));
       }
@@ -745,3 +782,15 @@ if (location.hostname === "www.reddit.com" && location.pathname === "/") {
   add_all_event();
   
 }
+
+function sendUpdateViewedPostToBackground( post_url) {
+  chrome.runtime.sendMessage({
+    message: "updateViewedPost",
+    data: {
+      post_url: post_url
+    }
+  });
+}
+
+// Call the function with appropriate parameters
+// sendUpdateViewedPostToBackground(userid, viewed_date, post_url);

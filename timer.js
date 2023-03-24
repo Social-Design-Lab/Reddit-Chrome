@@ -18,6 +18,15 @@ document.addEventListener('DOMContentLoaded', function () {
       startExp();
     }
   });
+
+  function navigateToParticipantId() {
+    // Hide the welcome interface
+    document.getElementById("welcome").style.display = "none";
+    // Show the participant ID interface
+    document.getElementById("participant-id").style.display = "block";
+  }
+
+  document.getElementById("welcome-next").addEventListener("click", navigateToParticipantId);
   
 /*   document.querySelector('#endbutton').addEventListener('click', () => {
     //console.log("endbutton has been clicked");

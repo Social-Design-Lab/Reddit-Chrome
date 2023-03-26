@@ -11,6 +11,8 @@ let likeschange1= false;
 let change_bgcolor = false; 
 let change_bgcolor_condition2 = false;
 let allbutton_and_activetime = false;
+let activetime =0;
+let activetime_start_date =new Date().toLocaleDateString(); 
 // get the userpid from local storage 
 chrome.storage.local.get(
   [
@@ -20,13 +22,20 @@ chrome.storage.local.get(
     'change_bgcolor',
     'change_bgcolor_condition2',
     'allbutton_and_activetime',
-    'endexp'
+    'endexp',
+    'activetime',
+    'activetime_start_date'
   ],
   function (result) {
     if (result.userpid === null || result.userpid === undefined) {
       console.log('userpid has not been stored yet');
     } else {
       userpid = result.userpid;
+    }
+    if (result.activetime === null || result.activetime === undefined) {
+      console.log('activetime has not been stored yet');
+    } else {
+      activetime = result.activetime;
     }
 
     if (result.likeschange === null || result.likeschange === undefined) {
@@ -698,23 +707,34 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 }); */
 
 // listen to active time from content js 
-let activetime_start_date =new Date().toLocaleDateString(); 
+
 //let activetime_start_date =new Date(); 
 //add 5 secondslet record_Date =  new Date(activetime_start_date.getTime() + 20000);
-let activetime =0;
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "active_time") {
   console.log("Active time: " + request.activeTime );
   if(activetime_start_date === new Date().toLocaleDateString() )
   {
     activetime=activetime+request.activeTime;
+
+    chrome.storage.local.set({ activetime: activetime }, function() {
+      console.log('activetime stored successfully.');
+    });
     //insertUserActive(userpid,activetime ); 
   }
   else
   {
     insertUserActive(userpid,activetime ); 
-    activetime=0; 
+    activetime=request.activeTime; 
+    chrome.storage.local.set({ activetime: activetime }, function() {
+      console.log('activetime stored successfully.');
+    });
     activetime_start_date =new Date().toLocaleDateString(); 
+
+    chrome.storage.local.set({ activetime_start_date: activetime_start_date }, function() {
+      console.log('activetime_start_date stored successfully.');
+    });
     //activetime_start_date =new Date(); 
   }
   }

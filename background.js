@@ -19,7 +19,8 @@ chrome.storage.local.get(
     'likeschange1',
     'change_bgcolor',
     'change_bgcolor_condition2',
-    'allbutton_and_activetime'
+    'allbutton_and_activetime',
+    'endexp'
   ],
   function (result) {
     if (result.userpid === null || result.userpid === undefined) {
@@ -32,6 +33,12 @@ chrome.storage.local.get(
       console.log('likeschange has not been stored yet');
     } else {
       likeschange = result.likeschange;
+    }
+
+    if (result.endexp === null || result.endexp === undefined) {
+      console.log('endexp has not been stored yet');
+    } else {
+      endexp = result.endexp;
     }
 
     if (result.likeschange1 === null || result.likeschange1 === undefined) {
@@ -269,6 +276,9 @@ function setExp()
       chrome.alarms.onAlarm.addListener(function(alarm) {
         if (alarm.name === "endAlarm") {
             endexp = true;
+            chrome.storage.local.set({ endexp: endexp }, function() {
+              console.log('endexp stored successfully.');
+            });
             console.log("exp ended from background");
             chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
               if (tabs.length === 0) {

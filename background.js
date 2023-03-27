@@ -14,6 +14,8 @@ let allbutton_and_activetime = false;
 let activetime =0;
 let activetime_start_date =new Date().toLocaleDateString(); 
 // get the userpid from local storage 
+
+
 chrome.storage.local.get(
   [
     'userpid',
@@ -36,6 +38,12 @@ chrome.storage.local.get(
       console.log('activetime has not been stored yet');
     } else {
       activetime = result.activetime;
+    }
+
+    if (result.activetime_start_date === null || result.activetime_start_date === undefined) {
+      console.log('activetime_start_date has not been stored yet');
+    } else {
+      activetime_start_date = result.activetime_start_date;
     }
 
     if (result.likeschange === null || result.likeschange === undefined) {
@@ -159,6 +167,11 @@ function setExp()
     endDate = new Date(startDate.getTime() + 20000);
     allbutton_and_activetime=true;
 
+    activetime_start_date =new Date().toLocaleDateString(); 
+
+    chrome.storage.local.set({ activetime_start_date: activetime_start_date }, function() {
+      console.log('activetime_start_date stored successfully.');
+    });
     chrome.storage.local.set({ allbutton_and_activetime: allbutton_and_activetime }, function() {
       console.log('allbutton_and_activetime stored successfully.');
     });
@@ -609,8 +622,7 @@ function insertBrowserHistory(uid, browserUrl) {
     });
 }
 // insert user active time on Reddit  
-function insertUserActive(uid, total_time) {
-  const viewDate = new Date().toLocaleDateString();
+function insertUserActive(uid,viewDate, total_time) {
   const requestBody = {
     userid: uid,
     active_onReddit: [
@@ -725,7 +737,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   }
   else
   {
-    insertUserActive(userpid,activetime ); 
+    console.log("a new date");
+    insertUserActive(userpid,activetime_start_date,activetime ); 
     activetime=request.activeTime; 
     chrome.storage.local.set({ activetime: activetime }, function() {
       console.log('activetime stored successfully.');
@@ -741,6 +754,5 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   });
 
 
-
-
+ 
 

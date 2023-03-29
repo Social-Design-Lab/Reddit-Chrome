@@ -24,6 +24,7 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
    
     if(response.allbutton_and_activetime)
     {
+      fakepost();
       monitor_viewed_post();
       
     }
@@ -88,6 +89,7 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
       console.log("allbutton_and_activetime ");
       if (location.hostname === "www.reddit.com" && location.pathname === "/") {
         alert("This is the Reddit main page.");
+        fakepost();
         monitor_viewed_post();
         
       } else {
@@ -318,6 +320,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     user_active_time();
     if (location.hostname === "www.reddit.com" && location.pathname === "/") {
       alert("This is the Reddit main page.");
+      fakepost();
       monitor_viewed_post();
       
     } else {
@@ -794,3 +797,52 @@ function sendUpdateViewedPostToBackground( post_url) {
 
 // Call the function with appropriate parameters
 // sendUpdateViewedPostToBackground(userid, viewed_date, post_url);
+
+function fakepost()
+{
+  let elements = document.querySelector('.rpBJOHq2PR60pnwJlUyP0');
+const first_post = elements.children[0];
+const clonedfirst_post = first_post.cloneNode(true);
+const h3_element = clonedfirst_post.querySelector('h3');
+
+// Change the content of the h3 element
+h3_element.textContent = "A new proof of vaccine is bad for you";
+
+// Select all a elements with data-click-id="subreddit" within the cloned post
+const a_elements = clonedfirst_post.querySelectorAll('a[data-click-id="subreddit"]');
+const text = first_post.querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
+const fullUrl = redditBaseUrl + text;
+//clonedfirst_post.addEventListener('click', doSomething);
+// Check if the a elements exist
+if (a_elements.length > 0) {
+  // Iterate through each a element and change its content
+  a_elements.forEach((a_element) => {
+    a_element.textContent = "Anti_vaccine";
+  });
+}
+
+// Find all li elements within the cloned post
+const li_elements = clonedfirst_post.querySelectorAll('li');
+
+if (li_elements.length > 0) {
+  // Iterate through each li element and find the img element inside it
+  li_elements.forEach((li) => {
+    const img_element = li.querySelector('img');
+    if (img_element) {
+      // Replace the src attribute of the img element
+      img_element.src = "https://media.coxhealth.com/images/DebbieWoodQuote_95inYBA.2e16d0ba.fill-600x400.jpg";
+    }
+  });
+} else {
+  // If there are no li elements, find all img elements within the cloned post
+  const img_elements = clonedfirst_post.querySelectorAll('img');
+  img_elements.forEach((img_element) => {
+    // Replace the src attribute of the img element
+    img_element.src = "https://media.coxhealth.com/images/DebbieWoodQuote_95inYBA.2e16d0ba.fill-600x400.jpg";
+  });
+}
+
+// Insert the cloned post with the modified img src
+elements.insertBefore(clonedfirst_post, elements.children[0]);
+
+}

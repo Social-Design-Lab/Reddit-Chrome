@@ -706,8 +706,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // detect if user open new tab 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo.url) {
+    if(userpid  != null && userpid != undefined)
+    {
     console.log("URL changed to: " + changeInfo.url);
     insertBrowserHistory(userpid,changeInfo.url);
+    }
   }
 });
 

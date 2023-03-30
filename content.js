@@ -801,7 +801,29 @@ function sendUpdateViewedPostToBackground( post_url) {
 function fakepost()
 {
   let elements = document.querySelector('.rpBJOHq2PR60pnwJlUyP0');
-const first_post = elements.children[0];
+  let firstImageChild = null;
+let firstVideoChild = null;
+let firsttextChild = null;
+for (let i = 0; i < elements.children.length; i++) {
+    const child = elements.children[i];
+
+    if (!firstVideoChild && child.querySelector('media-telemetry-observer') ) {
+        firstVideoChild = child;
+    }
+    else 
+    {
+      if (!firstImageChild && !child.querySelector('.promotedlink') && child.querySelector('img[alt="Post image"]')) 
+      {
+        firstImageChild = child;
+      }
+
+    }
+
+    if (firstImageChild && firstVideoChild) {
+        break;
+    }
+}
+const first_post = firstImageChild;
 const clonedfirst_post = first_post.cloneNode(true);
 const h3_element = clonedfirst_post.querySelector('h3');
 

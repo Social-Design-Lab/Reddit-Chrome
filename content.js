@@ -24,8 +24,14 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
    
     if(response.allbutton_and_activetime)
     {
-      fakepost();
-      monitor_viewed_post();
+      
+      
+      // Delay execution of fakepost() and monitor_viewed_post() by two seconds
+setTimeout(() => {
+  fakepost();
+  monitor_viewed_post();
+}, 2000); // 2000 milliseconds = 2 seconds
+
       
     }
 

@@ -8,6 +8,16 @@
 </head>
 <body>
     <div class="container mt-3" style="width: 450px;">
+        <div id="welcome" class="row-fluid">
+            <h2 class="text-center">Welcome to the Reddit Extension Experiment!</h2>
+            <form id="welcome-form">
+                <p>Please answer the question below:</p>
+                <label for="reason">What brings you to this experiment today?</label>
+                <input type="text" id="reason" name="reason" required="required"><br><br>
+                <button type="button" id="welcome-next" class="btn btn-success">Next</button>
+            </form>
+    </div>
+    <div class="container mt-3" style="width: 450px;">
         <div id="display" class="row-fluid">
             <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and in 10 second you will see background color changes!!!</p>
         </div>
@@ -29,4 +39,3 @@
     </div>
 </body>
 </html>
-

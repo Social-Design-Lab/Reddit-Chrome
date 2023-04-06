@@ -348,13 +348,13 @@ chrome.runtime.onMessage.addListener(
   );
 
   // end of the experiment 
-  chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.message === "end_exp") {
-        sendResponse({value: endexp});
-      }
-    }
-  );
+//  chrome.runtime.onMessage.addListener(
+//    function(request, sender, sendResponse) {
+//      if (request.message === "end_exp") {
+//        sendResponse({value: endexp});
+//      }
+//    }
+//  );
 
 // return the uid to timer.js
 chrome.runtime.onMessage.addListener(

@@ -13,33 +13,42 @@ function show(section) {
 
 //let myUrl = `https://www.example.com/?param=${uid}`;
 document.addEventListener('DOMContentLoaded', function () {
-  //load();
-  //document.querySelector('#start').addEventListener('click', startExp);
-  hide("settings");
-  hide("display");
-  hide("endexp");
-  hide("midpop");
-  document.getElementById("start").addEventListener("click", function () {
-    var participantId = document.getElementById("pid").value;
-    if (participantId === "") {
-      alert("Participant ID is required");
-    } else {
+    hide("settings");
+    hide("display");
+    hide("endexp");
+    hide("midpop");
+  
+    // Show the 'welcome' section at the beginning
+    show("welcome");
+  
+    document.getElementById("welcome-next").addEventListener("click", function () {
+      var reason = document.getElementById("reason").value;
+      if (reason === "") {
+        alert("Please answer the question");
+      } else {
+        // Hide the 'welcome' section and show the 'settings' section
+        hide("welcome");
+        show("settings");
+      }
+    });
+  
+    document.getElementById("start").addEventListener("click", function () {
+      var participantId = document.getElementById("pid").value;
+      if (participantId === "") {
+        alert("Participant ID is required");
+      } else {
         setTimeout(() => {
-            show("midpop");
-          }, 2000);
-      // Your code to submit the form
-      //create a timer for 2 seconds
-      
-      startExp();
-    }
+          show("midpop");
+        }, 2000);
+  
+        startExp();
+      }
+    });
+  
+    document.getElementById("midpop-submit").addEventListener("click", midpopupSubmit);
+  
+    initMidpopup();
   });
-
-  document.getElementById("welcome-next").addEventListener("click", load);
-
-  document.getElementById("midpop-submit").addEventListener("click", midpopupSubmit);
-
-  initMidpopup();
-});
 
 var q1selected = 0;
 var q2selected = 0;

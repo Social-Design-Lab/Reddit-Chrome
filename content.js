@@ -5,6 +5,7 @@
 //document.addEventListener("DOMContentLoaded", function(event) {
   // Your code here
 let active_triggered =false;
+const title = "A new proof of vaccine is bad for you";
 // below code is make sure even there is no fresh on page ,when user click post on reddit main page the effect still apply
 //chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   //if (request.message === "run_my_code") {
@@ -12,8 +13,10 @@ let active_triggered =false;
   //alert("from main page to post age");
 
 // this is used for user is on post page and then back to main page
+const fakepost_fullUrl = "https://www.reddit.com/r/moviecritic/comments/12lfnns/whats_your_favorite_quentin_tarantino_movie/"; 
+
 let homePageObserved = false;
-const redditBaseUrl = "https://www.reddit.com/";
+const redditBaseUrl = "https://www.reddit.com";
 const urlObserver = new MutationObserver(function(mutations) {
 mutations.forEach(function(mutation) {
 if (!homePageObserved && (window.location.href === "https://www.reddit.com/" || window.location.href === "https://www.reddit.com/?feed=home")) {
@@ -99,10 +102,18 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
         monitor_viewed_post();
         
       } else {
-        alert("This is not the Reddit main page.");
+        alert(`This is not the Reddit main page: ${window.location.href}`);
+       // alert(fakepost_fullUrl);
+        if(window.location.href === fakepost_fullUrl)
+        {
+          
+          alert("we are at fake post page");
+          changefakepost_dom();
+        }
         monitor_new_comment();
         insert_comment();
         listentobuttons();
+        
         
       }
      
@@ -190,7 +201,13 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
         //monitor_viewed_post();
         
       } else {
-        alert("This is not the Reddit main page.");
+        alert(`This is not the Reddit main page: ${window.location.href}`);
+        //alert(fakepost_fullUrl);
+        if(window.location.href === fakepost_fullUrl)
+        {
+          alert("we are at fake post page");
+          changefakepost_dom();
+        }
         monitor_new_comment();
         insert_comment();
         listentobuttons();
@@ -330,7 +347,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       monitor_viewed_post();
       
     } else {
-      alert("This is not the Reddit main page.");
+      alert(`This is not the Reddit main page: ${window.location.href}`);
+      //alert(fakepost_fullUrl);
+
+      if(window.location.href === fakepost_fullUrl)
+        {
+          alert("we are at fake post page");
+          changefakepost_dom();
+        }
       monitor_new_comment();
       insert_comment();
       listentobuttons();
@@ -834,12 +858,16 @@ const clonedfirst_post = first_post.cloneNode(true);
 const h3_element = clonedfirst_post.querySelector('h3');
 
 // Change the content of the h3 element
-h3_element.textContent = "A new proof of vaccine is bad for you";
+
+h3_element.textContent = title;
 
 // Select all a elements with data-click-id="subreddit" within the cloned post
 const a_elements = clonedfirst_post.querySelectorAll('a[data-click-id="subreddit"]');
 const text = first_post.querySelector(`[data-click-id="body"][class="SQnoC3ObvgnGjWt90zD9Z _2INHSNB8V5eaWp4P0rY_mE"]`).getAttribute("href");
-const fullUrl = redditBaseUrl + text;
+//fakepost_fullUrl = redditBaseUrl + text;
+/* chrome.storage.local.set({ 'fakepost_fullUrl': fakepost_fullUrl }, () => {
+  console.log('fakepost_fullUrl value saved:', fakepost_fullUrl);
+}); */
 //clonedfirst_post.addEventListener('click', doSomething);
 // Check if the a elements exist
 if (a_elements.length > 0) {
@@ -851,6 +879,24 @@ if (a_elements.length > 0) {
 
 // Find all li elements within the cloned post
 const li_elements = clonedfirst_post.querySelectorAll('li');
+// Assuming 'clonedFirstPost' is the element you want to add the event listener to
+clonedfirst_post.addEventListener('click', function () {
+  window.location.href = fakepost_fullUrl;
+
+
+  // Observe changes in the document's child elements and their subtree
+  
+// Change the content of the h1 element
+
+
+
+// If an img element is found, do something with it
+
+
+
+});
+
+
 
 if (li_elements.length > 0) {
   // Iterate through each li element and find the img element inside it
@@ -874,3 +920,60 @@ if (li_elements.length > 0) {
 elements.insertBefore(clonedfirst_post, elements.children[0]);
 
 }
+
+
+function changefakepost_dom ()
+{
+  const h1_element = document.querySelector('h1');
+  h1_element.textContent = title; 
+
+// Try to find the img inside the <a> element with the specified class name
+const imgElement = document.querySelector('a._3m20hIKOhTTeMgPnfMbVNN img');
+
+// If the img is not found, try to find it inside the <div> with the specified class name
+if (!imgElement) {
+  const imgElements = document.querySelectorAll('div._35oEP5zLnhKEbj5BlkTBUA img');
+  imgElements.forEach((imgElement) => {
+    // Replace the src attribute of the img element
+    imgElement.src = "https://media.coxhealth.com/images/DebbieWoodQuote_95inYBA.2e16d0ba.fill-600x400.jpg";
+  });
+
+}
+else{
+  imgElement.src = "https://media.coxhealth.com/images/DebbieWoodQuote_95inYBA.2e16d0ba.fill-600x400.jpg";
+
+}
+
+// Find the first <p> element with the specified class name
+const newpElement = document.querySelector('p._1qeIAgB0cPwnLhDF9XSiJM');
+
+// If the <p> element is found, change its content
+if (newpElement && newpElement.closest('div._1oQyIsiPHYt6nx7VOmd1sz')) {
+  // Change the content of the <p> element
+  newpElement.textContent = 'here are more reasons why vaccine is bad for you!';
+} else {
+  console.log('No <p> element with the specified class name found.');
+}
+}
+
+
+/* chrome.storage.local.get('fakepost_fullUrl', (result) => {
+  console.log('Retrieved fakepost_fullUrl value:', result.fakepost_fullUrl);
+});
+
+function onFakePostPageLoaded() {
+  
+  if (window.location.href === fakepost_fullUrl) {
+    // Perform your action here when the fake post URL is fully loaded
+    console.log('Fake post URL loaded:', fakepost_fullUrl);
+  }
+}
+
+// Listen for the load event to check if the URL has changed and is fully loaded
+window.addEventListener('load', onFakePostPageLoaded);
+
+// Check the initial URL when the content script is loaded
+onFakePostPageLoaded(); */
+
+
+

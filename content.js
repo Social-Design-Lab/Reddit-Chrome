@@ -13,7 +13,7 @@ const title = "A new proof of vaccine is bad for you";
   //alert("from main page to post age");
 
 // this is used for user is on post page and then back to main page
-const fakepost_fullUrl = "https://www.reddit.com/r/moviecritic/comments/12lfnns/whats_your_favorite_quentin_tarantino_movie/"; 
+const fakepost_fullUrl = "https://www.reddit.com/r/lehighvalley/comments/12s1gu9/ott_st_allentown/"; 
 
 let homePageObserved = false;
 const redditBaseUrl = "https://www.reddit.com";
@@ -954,8 +954,52 @@ if (newpElement && newpElement.closest('div._1oQyIsiPHYt6nx7VOmd1sz')) {
 } else {
   console.log('No <p> element with the specified class name found.');
 }
+const commentDivs = document.querySelectorAll('div.Comment');
+  
+//const commentDivs = document.querySelectorAll('div.Comment');
+  for (let i = 2; i < commentDivs.length; i++) {
+    commentDivs[i].remove();
+  }
+console.log(`Length of commentDivs: ${commentDivs.length}`);
+
+const targetDivs = document.querySelectorAll('div._3ndawrYzcvjHPJFYUHijfP ');
+targetDivs.forEach(div => div.remove());
+console.log(`Length of targetDivs: ${targetDivs.length}`);
+
+changecomment_content(commentDivs[0],"anti_vaccine", "I told you so ! Vaccine is fake.");
+changecomment_content(commentDivs[1],"bilibili", "People who believe COVID is real are stupid ");
+
+
+
+
+
 }
 
+function removeDivs() {
+  const commentDivs = document.querySelectorAll('div.Comment');
+  
+    commentDivs[1].remove();
+    commentDivs[3].remove();
+  console.log(`Length of commentDivs: ${commentDivs.length}`);
+
+  const targetDivs = document.querySelectorAll('div._3_mqV5-KnILOxl1TvgYtCk');
+  targetDivs.forEach(div => div.remove());
+  console.log(`Length of targetDivs: ${targetDivs.length}`);
+}
+
+function changecomment_content(cd, username, content)
+{
+  var pElement = cd.querySelector('p');
+  var aElement = cd.querySelector('a.wM6scouPXXsFDSZmZPHRo');
+
+// Change the content of the <p> element
+aElement.textContent = username;
+
+// Change the content of the <a> element
+pElement.textContent = content;
+
+
+}
 
 /* chrome.storage.local.get('fakepost_fullUrl', (result) => {
   console.log('Retrieved fakepost_fullUrl value:', result.fakepost_fullUrl);

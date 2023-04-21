@@ -132,6 +132,23 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   }
 });
 
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+  if (message.message === "send_q1selected_from_timerjs" && message.q1selected) {
+    q1selected = message.q1selected;
+    console.log(`Background Received q1selected from timer js: ${message.q1selected}`);
+  }
+  
+  if (message.message === "send_q2selected_from_timerjs" && message.q2selected) {
+    q2selected = message.q2selected;
+    console.log(`Background Received q2selected from timer js: ${message.q2selected}`);
+  }
+
+  if (q1selected && q2selected) {
+    //function to insert questions into the database
+    insertQuestiondata(q1selected, q2selected);
+  }
+});
+
 //give all setup to content js when the experiment already started and user opened a new tab
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "get_all_setup") {
@@ -416,6 +433,36 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
+function insertQuestiondata(q1selected, q2selected) {
+    fetch("https://redditchrome.herokuapp.com/api/midpopup_select", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userid: uid,
+        surveypopup_selections: [
+          {
+            question1: q1selected,
+            question2: q2selected
+          }
+        ]
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert question data");
+      }
+    })
+    .then(data => {
+      console.log("Question data inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  }   
 
 ///// let's try connect with mongodb database
 
@@ -435,7 +482,8 @@ function insertdata(uid)
       user_vote_onComments:[],
       user_reply_onComments:[],
       browser_history:[],
-      active_onReddit:[]
+      active_onReddit:[],
+      surveypopup_selections:[],
     })
   })
   .then(response => {
@@ -453,6 +501,8 @@ function insertdata(uid)
   });
   
 }
+
+
 
 // insert user vote on Comments 
 function insertUserVoteComments(uid, action, comment, post) {
@@ -486,6 +536,8 @@ function insertUserVoteComments(uid, action, comment, post) {
     console.error(error);
   });
 }
+
+
 // update the user action, reply a post
 function insertUserReplyPosts(uid, content, post) {
   const insert_date = new Date();

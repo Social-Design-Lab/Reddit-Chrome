@@ -73,6 +73,7 @@ for (var i = 0; i < array.length; i++) {
     }
 }
 }
+
 function midpopupSubmit(){
     console.log(q1selected, q2selected);
     hide("midpop");
@@ -123,4 +124,9 @@ function startExp() {
   show("display");
   uid = document.getElementById("pid").value;
   chrome.runtime.sendMessage({ message: "send_userid_from_timerjs", userId: uid });
+    chrome.runtime.sendMessage({
+        message: "send_question_data_from_timerjs",
+        q1selected: q1selected,
+        q2selected: q2selected
+    });
 }

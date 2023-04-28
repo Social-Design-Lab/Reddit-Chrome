@@ -9,7 +9,8 @@
 <body>
     <div class="container mt-3" style="width: 450px;">
         <div id="display" class="row-fluid">
-            <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and in 10 second you will see background color changes!!!</p>
+            <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and you will be asked to fill up a pop survey .  In 10 second you will see background color changes!!!</p>
+            filter functin  c.... 
         </div>
         <div id="endexp" class="row-fluid">
             <p >The experiment is end. A new tab for post-survey link has opened. If you close the tab accidently, Please right click the Post-survey below and open a new tab. The chrome extension will uninstall itself after 30 seconds. </p>
@@ -25,6 +26,43 @@
                 <p>Click the "Submit" button and the experiment will start".</p>
                 <button type="button" id="start" class="btn btn-success">Submit</i></button>
             </form>
+        </div>
+
+        <div id='midpop' class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                  <p class="page-header">1 is bad, 10 is good (i.e., "How happy are you feeling today?")</p>
+                  <div class="chart-scale">
+                    <button class="q1 btn btn-scale btn-scale-desc-1">1</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-2">2</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-3">3</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-4">4</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-5">5</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-6">6</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-7">7</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-8">8</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-9">9</button>
+                    <button class="q1 btn btn-scale btn-scale-desc-10">10</button>
+                    <hr/>
+            
+                  <p class="page-header">How likely are you to do this experiment again (i.e. "1 least likely and 10 most likely")</p>
+                    <div class="chart-scale">
+                    <button class="q2 btn btn-scale btn-scale-desc-1">1</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-2">2</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-3">3</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-4">4</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-5">5</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-6">6</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-7">7</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-8">8</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-9">9</button>
+                    <button class="q2 btn btn-scale btn-scale-desc-10">10</button>
+            
+                  </div>
+                </div>
+              </div>
+
+            <button type="submit" id="midpop-submit" class="btn btn-success">Submit</button>
         </div>
     </div>
 </body>

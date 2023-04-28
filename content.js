@@ -960,11 +960,11 @@ const commentDivs = document.querySelectorAll('div.Comment');
   for (let i = 2; i < commentDivs.length; i++) {
     commentDivs[i].remove();
   }
-console.log(`Length of commentDivs: ${commentDivs.length}`);
+//console.log(`Length of commentDivs: ${commentDivs.length}`);
 
 const targetDivs = document.querySelectorAll('div._3ndawrYzcvjHPJFYUHijfP ');
 targetDivs.forEach(div => div.remove());
-console.log(`Length of targetDivs: ${targetDivs.length}`);
+//console.log(`Length of targetDivs: ${targetDivs.length}`);
 
 changecomment_content(commentDivs[0],"anti_vaccine", "I told you so ! Vaccine is fake.");
 changecomment_content(commentDivs[1],"bilibili", "People who believe COVID is real are stupid ");
@@ -984,7 +984,7 @@ function removeDivs() {
 
   const targetDivs = document.querySelectorAll('div._3_mqV5-KnILOxl1TvgYtCk');
   targetDivs.forEach(div => div.remove());
-  console.log(`Length of targetDivs: ${targetDivs.length}`);
+  //console.log(`Length of targetDivs: ${targetDivs.length}`);
 }
 
 function changecomment_content(cd, username, content)
@@ -1018,6 +1018,7 @@ window.addEventListener('load', onFakePostPageLoaded);
 
 // Check the initial URL when the content script is loaded
 onFakePostPageLoaded(); */
+
 
 
 

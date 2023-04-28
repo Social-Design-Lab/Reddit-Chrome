@@ -14,7 +14,7 @@ let allbutton_and_activetime = false;
 let activetime =0;
 let activetime_start_date =new Date().toLocaleDateString(); 
 // get the userpid from local storage 
-
+let survey;
 
 chrome.storage.local.get(
   [
@@ -26,7 +26,8 @@ chrome.storage.local.get(
     'allbutton_and_activetime',
     'endexp',
     'activetime',
-    'activetime_start_date'
+    'activetime_start_date',
+    'survey'
   ],
   function (result) {
     if (result.userpid === null || result.userpid === undefined) {
@@ -38,6 +39,11 @@ chrome.storage.local.get(
       console.log('activetime has not been stored yet');
     } else {
       activetime = result.activetime;
+    }
+    if (result.survey === null || result.survey === undefined) {
+      console.log('survey has not been stored yet');
+    } else {
+      survey = result.survey;
     }
 
     if (result.activetime_start_date === null || result.activetime_start_date === undefined) {
@@ -164,7 +170,7 @@ function setExp()
     //add 5 seconds
     likesDate = new Date(startDate.getTime() + 5000);
     bgDate = new Date(startDate.getTime() + 10000);
-    endDate = new Date(startDate.getTime() + 20000);
+    endDate = new Date(startDate.getTime() + 60000);
     allbutton_and_activetime=true;
 
     activetime_start_date =new Date().toLocaleDateString(); 
@@ -194,6 +200,10 @@ function setExp()
       
       chrome.alarms.onAlarm.addListener(function(alarm) {
         if (alarm.name === "myAlarm") {
+          survey = true; 
+              chrome.storage.local.set({ survey: survey }, function() {
+                console.log('survey stored successfully.');
+              });
           // background.js
             console.log("alarm goes on");
           chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -202,6 +212,7 @@ function setExp()
               if(exp_cond==1) {
                 //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
                 likeschange1 = true;
+                
                 chrome.storage.local.set({ likeschange1: likeschange1 }, function() {
                   console.log('likeschange1 stored successfully.');
                 });
@@ -209,10 +220,13 @@ function setExp()
               else{
                 //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
                 likeschange = true;
+                
                 chrome.storage.local.set({ likeschange: likeschange }, function() {
                   console.log('likeschange stored successfully.');
                 });
               }
+              
+
               return;
             }
            
@@ -703,6 +717,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   }
 });
 
+// listen fro message from timder.js and send back survey time  
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "survey_time") {
+    // Get the user ID from storage or other sources
+    sendResponse({ survey: survey });
+  }
+});
+
 // detect if user open new tab 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo.url) {
@@ -757,5 +779,33 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   });
 
 
- 
 
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'changeSurveyValue') {
+      survey = message.newValue;
+      chrome.storage.local.set({ survey: survey }, function() {
+        console.log('survey stored successfully.');
+      });
+
+      //console.log('Value updated to:', someValue);
+    }
+  });
+
+
+  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.message === "everything_for_timer") {
+      // Get the user ID from storage or other sources
+      const user_id = userpid; // Replace with appropriate code to get user_id
+  
+      // Get the survey value
+      const survey_value = survey; // Replace with appropriate code to get survey value
+  
+      // Get the end_exp value
+      const end_exp = endexp; // Replace with appropriate code to get end_exp value
+  
+      console.log("Sending response with user_id:", user_id, "survey:", survey_value, "end_exp:", end_exp);
+      sendResponse({ user_id: user_id, survey: survey_value, end_exp: end_exp });
+    }
+  });
+  
+  

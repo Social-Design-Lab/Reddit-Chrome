@@ -132,28 +132,27 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   }
 });
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-  if (message.message === "send_q1selected_from_timerjs" && message.q1selected) {
-    q1selected = message.q1selected;
-    console.log(`Background Received q1selected from timer js: ${message.q1selected}`);
-  }
-  
-  if (message.message === "send_q2selected_from_timerjs" && message.q2selected) {
-    q2selected = message.q2selected;
-    console.log(`Background Received q2selected from timer js: ${message.q2selected}`);
-  }
+function get_all_setup(tabId, message){
+    chrome.tabs.sendMessage(tabId, { message: "get_all_setup" });
+}
 
-  if (q1selected && q2selected) {
-    //function to insert questions into the database
-    insertQuestiondata(q1selected, q2selected);
-  }
-});
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    console.log("Message received in background.js:", message);
+  if (message.message === "send_question_data_from_timerjs" && message.q1selected && message.q2selected) {
+    q1selected = message.q1selected;
+    q2selected = message.q2selected;
+    console.log(`Background Received both questions from timer js: ${message.q1selected} and ${message.q2selected}`);
+        if (q1selected !== 0 || q2selected !== 0) {
+            console.log("inserting question data");
+            insertQuestiondata(q1selected, q2selected, userpid);
+    }
+}});
 
 //give all setup to content js when the experiment already started and user opened a new tab
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "get_all_setup") {
-  sendResponse({
 
+  get_all_setup( sender.tab.id, {
   likeschange1:likeschange1,
   likeschange:likeschange,
   change_bgcolor:change_bgcolor,
@@ -433,7 +432,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-function insertQuestiondata(q1selected, q2selected) {
+function insertQuestiondata(q1selected, q2selected, uid) {
     fetch("https://redditchrome.herokuapp.com/api/midpopup_select", {
       method: "POST",
       headers: {

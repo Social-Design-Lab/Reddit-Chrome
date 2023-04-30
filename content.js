@@ -708,6 +708,29 @@ window.addEventListener("scroll", function() {
 });
 }
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.message = "get_all_setup"){
+        if(response.likeschange1)
+      {
+        //console.log(" change likes");
+        changelikes(100);
+      }
+      if(response.likeschange)
+      {
+        
+
+        changelikes(56);
+        
+      }
+      if(response.allbutton_and_activetime)
+      {
+        
+          listentobuttons();
+          monitor_new_comment();
+        
+      }
+    }
+});
 
 
 // this function is used for only post page(sub reddit page ) when user scroll the page or clicked more reply(new elements added into the DOM)

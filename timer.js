@@ -1,6 +1,7 @@
 let time;
 let endexp = false;
 let uid;
+let midpopCounter = 0; // Add a counter for the number of times the midpop has been shown
 
 // Define a variable in the popup
 function show(section) {
@@ -83,9 +84,17 @@ chrome.runtime.sendMessage({
 
 }
 
-function midpopupSubmit(){
-    console.log(q1selected, q2selected);
-    hide("midpop");
+function midpopupSubmit() {
+  console.log(q1selected, q2selected);
+  hide("midpop");
+
+  // Increment the counter and show the midpop again if the counter is less than 10
+  midpopCounter++;
+  if (midpopCounter < 10) {
+    setTimeout(() => {
+      show("midpop");
+    }, 5000);
+  }
 }
 
 function load() {

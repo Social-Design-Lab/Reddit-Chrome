@@ -170,7 +170,7 @@ function setExp()
     //add 5 seconds
     likesDate = new Date(startDate.getTime() + 5000);
     bgDate = new Date(startDate.getTime() + 10000);
-    endDate = new Date(startDate.getTime() + 60000);
+    endDate = new Date(startDate.getTime() + 600000);
     allbutton_and_activetime=true;
 
     activetime_start_date =new Date().toLocaleDateString(); 
@@ -449,7 +449,8 @@ function insertdata(uid)
       user_vote_onComments:[],
       user_reply_onComments:[],
       browser_history:[],
-      active_onReddit:[]
+      active_onReddit:[], 
+      surveypopup_selections:[] ,
     })
   })
   .then(response => {
@@ -823,5 +824,47 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       sendResponse({ user_id: user_id, survey: survey_value, end_exp: end_exp });
     }
   });
-  
-  
+
+
+  function insertQuestiondata(q1selected, q2selected, uid) {
+    fetch("https://redditchrome.herokuapp.com/api/midpopup_select", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userid: uid,
+        surveypopup_selections: [
+          {
+            question1: q1selected,
+            question2: q2selected
+          }
+        ]
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert question data");
+      }
+    })
+    .then(data => {
+      console.log("Question data inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  }
+
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+  console.log("Message received in background.js:", message);
+  if (message.message === "send_question_data_from_timerjs" && message.data.q1selected && message.data.q2selected) {
+      const q1selected = message.data.q1selected;
+      const q2selected = message.data.q2selected;
+      console.log("Received values:", q1selected, q2selected);
+      insertQuestiondata(q1selected, q2selected, userpid);
+      // Rest of your code...
+  }
+});

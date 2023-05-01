@@ -20,12 +20,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   document.getElementById("midpop-submit").addEventListener("click", function () {
+    const selectedQ1 = document.querySelector('[data-question-group="q1"].active');
+    const selectedQ2 = document.querySelector('[data-question-group="q2"].active');
+    //alert('Selected value for Q1: ' + selectedQ1.textContent + '\nSelected value for Q2: ' + selectedQ2.textContent);
+
+    chrome.runtime.sendMessage({
+      message: "send_question_data_from_timerjs",
+      data: {
+          q1selected: selectedQ1.textContent,
+          q2selected: selectedQ2.textContent
+      }
+  });
     chrome.runtime.sendMessage({ action: 'changeSurveyValue', newValue: false });
     hide("settings");
     show("display");
     hide("endexp");
     hide("midpop");
   });
+  
 
 });
 
@@ -99,3 +111,30 @@ function startExp() {
   uid = document.getElementById("pid").value;
   chrome.runtime.sendMessage({ message: "send_userid_from_timerjs", userId: uid });
 }
+
+
+
+
+ // Add this script block inside the head
+// Add this script block inside the head
+document.addEventListener("DOMContentLoaded", function() {
+  const buttons = document.querySelectorAll(".btn-scale");
+
+  buttons.forEach((button) => {
+      button.addEventListener("click", function() {
+          const questionGroup = this.dataset.questionGroup;
+          const sameGroupButtons = document.querySelectorAll(`[data-question-group="${questionGroup}"]`);
+
+          sameGroupButtons.forEach((btn) => {
+              btn.classList.remove("active");
+          });
+
+          this.classList.add("active");
+      });
+  });
+});
+
+
+
+
+

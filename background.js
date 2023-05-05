@@ -860,7 +860,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   console.log("Message received in background.js:", message);
-  if (message.message === "send_question_data_from_timerjs" && message.data.q1selected && message.data.q2selected) {
+  if (message.message === "send_question_data_from_timerjs_chrome" && message.data.q1selected && message.data.q2selected) {
       const q1selected = message.data.q1selected;
       const q2selected = message.data.q2selected;
       console.log("Received values:", q1selected, q2selected);
@@ -1020,4 +1020,41 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
       console.log("background sendding error: ", error);
     }
   }
+});
+
+
+function insertQuestiondata(surveyObj, uid) {
+  fetch("https://redditchrome.herokuapp.com/api/midpopup_select", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      surveypopup_selections: 
+        surveyObj
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert question data");
+    }
+  })
+  .then(data => {
+    console.log("Question data inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+console.log("Message received in background.js:", message);
+if (message.message === "send_question_data_from_timerjs") {
+    console.log("Received values:", message.data);
+    insertQuestiondata(message.data, userpid);
+}
 });

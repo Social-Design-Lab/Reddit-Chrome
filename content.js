@@ -325,6 +325,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.message === "change_bgcolor") {
       changebg("red");
+      startSurveyPopup();
+        surveyInterval = setInterval(() => {
+            startSurveyPopup();
+        }, 10000);
+
+      
       console.log("Received message from the background script for change bg colro:", request.message);
       
     }
@@ -333,6 +339,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "change_bgcolor_condition2") {
     changebg("green");
+    startSurveyPopup();
+        surveyInterval = setInterval(() => {
+            startSurveyPopup();
+        }, 10000);
+
+    
     console.log("Received message from the background script for change bg colro:", request.message);
     
   }
@@ -1180,9 +1192,224 @@ function unhideComments() {
 
 
 
+////  dan 
+var surveyQuestionsCoutner = 0,
+surveyPopup,
+surveyInterval;
+let q1selected = 0,
+q2selected = 0;
+
+
+var surveyQuestions = [
+    [`1 is bad, 10 is good (i.e., "How happy are you feeling today?")`,
+        `How likely are you to do this experiment again (i.e. "1 least likely and
+        10 most likely")`
+    ],
+    [`To what extent are you feeling tense while using the Reddit interface?`,
+        `To what extent are you disinterested in the content you are viewing?`
+    ],
+    [`How captivating do you find the content you are viewing?`,
+        `How valuable do you find the information presented in the content you are viewing?`
+    ],
+    [`To what extent are you invested in the content you are viewing?`,
+        `How joyful do you feel about the content you are viewing?`
+    ],
+    [`To what extent are you annoyed while using the Reddit interface?`,
+        `How comprehensible do you find the content you are viewing?`
+    ],
+];
+
+function getSurveyHTML() {
+    return `
+<div id='midpop' class="container">
+<div class="row">
+    <div class="col-xs-12">
+        <p class="page-header">${surveyQuestions[surveyQuestionsCoutner][0]}</p>
+        <div class="chart-scale">
+            <button class="q1 btn btn-scale btn-scale-desc-1">1</button>
+            <button class="q1 btn btn-scale btn-scale-desc-2">2</button>
+            <button class="q1 btn btn-scale btn-scale-desc-3">3</button>
+            <button class="q1 btn btn-scale btn-scale-desc-4">4</button>
+            <button class="q1 btn btn-scale btn-scale-desc-5">5</button>
+            <button class="q1 btn btn-scale btn-scale-desc-6">6</button>
+            <button class="q1 btn btn-scale btn-scale-desc-7">7</button>
+            <button class="q1 btn btn-scale btn-scale-desc-8">8</button>
+            <button class="q1 btn btn-scale btn-scale-desc-9">9</button>
+            <button class="q1 btn btn-scale btn-scale-desc-10">10</button>
+            <hr>
+            </div>
+
+            <p class="page-header">${surveyQuestions[surveyQuestionsCoutner][1]}</p>
+            <div class="chart-scale">
+                <button class="q2 btn btn-scale btn-scale-desc-1">1</button>
+                <button class="q2 btn btn-scale btn-scale-desc-2">2</button>
+                <button class="q2 btn btn-scale btn-scale-desc-3">3</button>
+                <button class="q2 btn btn-scale btn-scale-desc-4">4</button>
+                <button class="q2 btn btn-scale btn-scale-desc-5">5</button>
+                <button class="q2 btn btn-scale btn-scale-desc-6">6</button>
+                <button class="q2 btn btn-scale btn-scale-desc-7">7</button>
+                <button class="q2 btn btn-scale btn-scale-desc-8">8</button>
+                <button class="q2 btn btn-scale btn-scale-desc-9">9</button>
+                <button class="q2 btn btn-scale btn-scale-desc-10">10</button>
+            </div>
+
+    </div>
+
+    <button type="submit" id="midpop-submit" class="btn btn-success" onsumbit="">Submit</button>
+</div>
+</div>
+`
+}
+
+function surveyPopupShow() {
+    surveyPopup = new smq.Popup({
+        title: 'Reddit Extension Survey',
+        innerHtml: getSurveyHTML()
+    });
+    surveyPopup.show();
+}
 
 
 
+function initSurveyQ() {
+    var arr = document.querySelectorAll(".btn-scale");
+
+    for (var i = 0; i < arr.length; i++) {
+        arr[i].addEventListener("click", surveyButtonSelect);
+    }
+}
+
+function surveyButtonSelect(event) {
+  var array = event.target.classList;
+
+  for (var i = 0; i < array.length; i++) {
+    if (array[i] == "q1") {
+      if (q1selected != 0) {
+        // remove highlight class from previously selected button
+        document.querySelector(".q1.btn-scale-desc-" + q1selected).classList.remove("highlight");
+      }
+      q1selected = event.target.innerHTML;
+      // add highlight class to selected button
+      event.target.classList.add("highlight");
+    } else if (array[i] == "q2") {
+      if (q2selected != 0) {
+        // remove highlight class from previously selected button
+        document.querySelector(".q2.btn-scale-desc-" + q2selected).classList.remove("highlight");
+      }
+      q2selected = event.target.innerHTML;
+      // add highlight class to selected button
+      event.target.classList.add("highlight");
+    }
+  }
+}
+
+
+function surveySubmit() {
+
+    
+    var surveyObj = {
+        q1: {
+            q: surveyQuestions[surveyQuestionsCoutner][0],
+            a: q1selected,
+        },
+        q2: {
+            q: surveyQuestions[surveyQuestionsCoutner][1],
+            a: q2selected,
+        }
+    }
+
+    chrome.runtime.sendMessage({
+        message: "send_question_data_from_timerjs",
+        data: surveyObj
+    });
+
+    surveyPopup.close();
+    console.log(surveyObj);
+    /*chrome.runtime.sendMessage({
+        message: "send_question_data_from_timerjs",
+        q1selected: q1selected,
+        q2selected: q2selected
+    });
+    chrome.runtime.sendMessage({
+        message: "question_submitted"
+    });*/
+}
+
+function startSurveyPopup() {
+    surveyPopupShow();
+    initSurveyQ();
+    document.querySelector("#midpop-submit").addEventListener("click", surveySubmit);
+    surveyQuestionsCoutner += 1;
+}
+
+/* chrome.storage.local.get('fakepost_fullUrl', (result) => {
+  console.log('Retrieved fakepost_fullUrl value:', result.fakepost_fullUrl);
+});
+
+function onFakePostPageLoaded() {
+  
+  if (window.location.href === fakepost_fullUrl) {
+    // Perform your action here when the fake post URL is fully loaded
+    console.log('Fake post URL loaded:', fakepost_fullUrl);
+  }
+}
+
+// Listen for the load event to check if the URL has changed and is fully loaded
+window.addEventListener('load', onFakePostPageLoaded);
+
+// Check the initial URL when the content script is loaded
+onFakePostPageLoaded(); */
+
+
+
+
+
+
+var smq = {
+
+  Popup: function(config) {
+
+    this.conf = config || {};
+
+    this.init = function() {
+      var conf = config || {};
+      //if there are <smq-popup>, remove nodes
+      var existingNodes = document.getElementsByTagName("smq-popup");
+      if(existingNodes && existingNodes.length > 0) {
+        for(var i = 0; i<existingNodes.length; i++) {
+          document.body.removeChild(existingNodes[i]);
+        }
+      }
+
+      //create popup nodes
+      this.nodePopup = document.createElement("smq-popup");
+      this.nodePopup.innerHTML = '<div class="window"><header class="api-header"><h1 class="api-title"></h1></header><div class="api-content"></div></div>';
+      this.nodePopup.getElementsByClassName("api-title")[0].innerHTML = this.conf.title || "";
+      this.nodePopup.getElementsByClassName("api-content")[0].innerHTML = this.conf.innerHtml || "";
+
+      
+
+    };
+
+    this.show = function() {
+      //insert nodePopup in body
+      document.body.appendChild(this.nodePopup);
+    };
+
+    this.close = function() {
+      this.nodePopup ? document.body.removeChild(this.nodePopup) : null;
+      this.nodePopup = undefined;
+    };
+
+    this.init(config);
+
+  }
+};
+
+
+chrome.tabs.insertCSS(tabId, {
+  file: 'popup.css'
+});
 
 
 

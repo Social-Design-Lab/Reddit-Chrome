@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //alert('Selected value for Q1: ' + selectedQ1.textContent + '\nSelected value for Q2: ' + selectedQ2.textContent);
 
     chrome.runtime.sendMessage({
-      message: "send_question_data_from_timerjs",
+      message: "send_question_data_from_timerjs_chrome",
       data: {
           q1selected: selectedQ1.textContent,
           q2selected: selectedQ2.textContent

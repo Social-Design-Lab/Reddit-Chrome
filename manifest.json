@@ -13,7 +13,8 @@
     "content_scripts": [
       {
         "js": ["content.js"],
-        "matches": ["https://www.reddit.com/*"]
+        "matches": ["https://www.reddit.com/*"],
+        "css": ["popup.css"]
       }
     ],
     "permissions": [
@@ -25,17 +26,6 @@
       "storage",
       "scripting"
     ],
-    "host_permissions": ["https://redditchrome.herokuapp.com/"],
-    "web_accessible_resources": [
-      {
-          "resources": [
-              "libs/popup.css",
-              "libs/popup.js"
-          ],
-          "matches": [
-              "https://www.reddit.com/*"
-          ]
-      }
-  ]
+    "host_permissions": ["https://redditchrome.herokuapp.com/"]
   }
   

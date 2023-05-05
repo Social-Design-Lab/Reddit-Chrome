@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Reddit Like Button Number Changer",
+    "name": "Reddit COVID Project",
     "version": "1.0",
     "author": "Chenchen Mao",
     "action":{
@@ -22,8 +22,20 @@
       "notifications",
       "activeTab",
       "identity",
-      "storage"
+      "storage",
+      "scripting"
     ],
-    "host_permissions": ["https://redditchrome.herokuapp.com/"]
+    "host_permissions": ["https://redditchrome.herokuapp.com/"],
+    "web_accessible_resources": [
+      {
+          "resources": [
+              "libs/popup.css",
+              "libs/popup.js"
+          ],
+          "matches": [
+              "https://www.reddit.com/*"
+          ]
+      }
+  ]
   }
   

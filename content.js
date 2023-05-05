@@ -4,7 +4,7 @@
 //let uid;
 //document.addEventListener("DOMContentLoaded", function(event) {
   // Your code here
-let active_triggered =false;
+let new_active_triggered =false;
 const title = "A new proof of vaccine is bad for you";
 // below code is make sure even there is no fresh on page ,when user click post on reddit main page the effect still apply
 //chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -189,7 +189,7 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
     if(response.allbutton_and_activetime)
     {
       console.log("allbutton_and_activetime ");
-      if(active_triggered )
+      if(new_active_triggered )
       {
         
       }
@@ -361,7 +361,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       
     }
    
-    active_triggered=true;
+    new_active_triggered=true;
     console.log("Received message from the background script for listen the button:", request.message);
     
   }
@@ -1001,23 +1001,189 @@ pElement.textContent = content;
 
 }
 
-/* chrome.storage.local.get('fakepost_fullUrl', (result) => {
-  console.log('Retrieved fakepost_fullUrl value:', result.fakepost_fullUrl);
+const covidKeywords = [
+  'COVID-19',
+  'coronavirus',
+  'pandemic',
+  'SARS-CoV-2',
+  'lockdown',
+  'quarantine',
+  'social distancing',
+  'face mask',
+  'hand sanitizer',
+  'vaccine',
+  'vaccination',
+  'testing',
+  'symptoms',
+  'asymptomatic',
+  'incubation',
+  'transmission',
+  'ventilator',
+  'intensive care',
+  'epidemic',
+  'outbreak',
+  'contact tracing',
+  'immunity'
+];
+let highlightedNodes ; // Keep track of highlighted nodes
+let replacedNodes ; // Keep track of replaced nodes
+// Retrieve the highlightedNodes array from Chrome storage
+chrome.storage.local.get('highlightedNodes', function(result) {
+  highlightedNodes = result.highlightedNodes;
+ // Remove the highlighting from all the stored nodes
+
 });
 
-function onFakePostPageLoaded() {
-  
-  if (window.location.href === fakepost_fullUrl) {
-    // Perform your action here when the fake post URL is fully loaded
-    console.log('Fake post URL loaded:', fakepost_fullUrl);
+chrome.storage.local.get('', function(result) {
+   replacedNodes = result.replacedNodes;
+  // Remove the highlighting from all the stored nodes
+
+});
+
+
+
+
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.message === "send_options") {
+    let options = request.optionalValue;
+    const nodes = document.querySelectorAll('*:not(:has(*))');
+    highlightedNodes = []; // Keep track of highlighted nodes
+    replacedNodes = []; // Keep track of replaced nodes
+    const commentDivs = document.querySelectorAll('div.Comment');
+    //alert(options);
+    switch (options) {
+      case 2:
+        nodes.forEach(function (node) {
+          let nodeHTML = node.innerHTML;
+            
+          covidKeywords.forEach(function (keyword) {
+            if (node.textContent.includes(keyword)) {
+              const className = `highlighted-${highlightedNodes.length}`;
+              const highlightedKeyword = `<span class="${className}" style="background-color: yellow">${keyword}</span>`;
+              nodeHTML = nodeHTML.split(keyword).join(highlightedKeyword);
+              highlightedNodes.push(className);
+            }
+          });
+            
+          node.innerHTML = nodeHTML;
+        });
+        
+        chrome.storage.local.set({ 'highlightedNodes': highlightedNodes }, function () {
+          console.log('Highlighted nodes stored in Chrome storage');
+        });
+        
+        break;
+      case 3: 
+        nodes.forEach(function (node) {
+          let nodeHTML = node.innerHTML;
+        
+          covidKeywords.forEach(function (keyword) {
+            if (node.textContent.includes(keyword)) {
+              const id = `replaced-${replacedNodes.length}`;
+              const replaceWords = `<span id="${id}">Chenchen</span>`;
+              const keywordRegex = new RegExp(keyword, 'g'); // create a RegExp object with the keyword to match all occurrences
+              const nodeData = {
+                id: id,
+                originalKeyword: keyword // store only the original keyword
+              };
+              nodeHTML = nodeHTML.replace(keywordRegex, replaceWords); // replace all occurrences of the keyword with the replacement HTML
+              replacedNodes.push(nodeData);
+            }
+          });
+        
+          node.innerHTML = nodeHTML;
+        });
+        
+        chrome.storage.local.set({ 'replacedNodes': replacedNodes }, function () {
+          console.log('Replaced nodes stored in Chrome storage');
+        });
+        
+        break;
+      case 4: 
+        
+
+        // Hide all comments
+        commentDivs.forEach((commentDiv) => {
+          commentDiv.style.display = 'none';
+        });
+              
+        break; 
+      case 5:
+
+        // Hide comments containing keywords
+        commentDivs.forEach((commentDiv) => {
+          const commentText = commentDiv.textContent.toLowerCase();
+          const containsKeyword = covidKeywords.some((keyword) => commentText.includes(keyword));
+          if (containsKeyword) {
+            commentDiv.style.display = 'none';
+          }
+        });
+        break; 
+
+      case -1:
+        undoHighlighting();
+        undoReplacement();
+        unhideComments();
+        break;
+      // Other cases...
+    }
   }
+});
+
+function undoHighlighting() {
+  chrome.storage.local.get(['highlightedNodes'], function (result) {
+    if (result.highlightedNodes) {
+      result.highlightedNodes.forEach(function (className) {
+        const highlightedNodes = document.querySelectorAll(`.${className}`);
+        highlightedNodes.forEach(function (node) {
+          node.outerHTML = node.innerHTML; // replace the node with its inner HTML to remove the highlight span element
+          node.classList.remove(className); // remove the unique class name
+        });
+      });
+
+      chrome.storage.local.remove(['highlightedNodes'], function () {
+        console.log('Highlighted nodes removed from Chrome storage');
+      });
+    }
+  });
 }
 
-// Listen for the load event to check if the URL has changed and is fully loaded
-window.addEventListener('load', onFakePostPageLoaded);
 
-// Check the initial URL when the content script is loaded
-onFakePostPageLoaded(); */
+function undoReplacement() {
+  chrome.storage.local.get(['replacedNodes'], function (result) {
+    if (result.replacedNodes) {
+      result.replacedNodes.forEach(function (nodeData) {
+        const replacedNode = document.querySelector(`#${nodeData.id}`);
+        if (replacedNode) {
+          const keywordRegex = new RegExp('Chenchen', 'g'); // create a RegExp object with the replacement keyword to match all occurrences
+          replacedNode.innerHTML = replacedNode.innerHTML.replace(keywordRegex, nodeData.originalKeyword);
+          replacedNode.removeAttribute('id');
+        }
+      });
+
+      chrome.storage.local.remove(['replacedNodes'], function () {
+        console.log('Replaced nodes removed from Chrome storage');
+      });
+    }
+  });
+}
+
+function unhideComments() {
+  const commentDivs = document.querySelectorAll('div.Comment');
+
+  commentDivs.forEach((commentDiv) => {
+    commentDiv.style.display = 'block'; // or 'inline-block', depending on the original display value
+  });
+}
+
+
+
+
+
+
+
+
 
 
 

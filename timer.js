@@ -2,6 +2,7 @@ let time;
 let endexp = false;
 let uid;
 let pop_survey = false; 
+let options = 0;
 // Define a variable in the popup
 
 //let myUrl = `https://www.example.com/?param=${uid}`;
@@ -37,7 +38,55 @@ document.addEventListener('DOMContentLoaded', function () {
     hide("endexp");
     hide("midpop");
   });
-  
+  // popup run after dom is loaded
+  var $ = document.querySelector.bind(document)
+  var btnOptions = document.getElementById("btnOptions");
+  btnOptions.addEventListener("change", function() {
+    // Perform an action based on the selected option
+    options = btnOptions.selectedIndex;
+   
+  });
+  $("#btnHighlight").onclick = e => {
+    //console.log("btnHighlight is clicked")
+    //alert("btnHighlight: "+ options)
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tabs[0].id },
+          files: ['content.js'],
+        },
+        () => {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "send_options", optionalValue: options }, function (response) {
+            // Handle the response from the content script, if needed
+          });
+        }
+      );
+    });
+    
+
+    
+
+
+  }
+  $("#btnReset").onclick = e => {
+    //console.log("btnHighlight is clicked")
+    //alert("btnReset: "+ options)
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tabs[0].id },
+          files: ['content.js'],
+        },
+        () => {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "send_options", optionalValue: -1 }, function (response) {
+            // Handle the response from the content script, if needed
+          });
+        }
+      );
+    });
+    
+  }
+
 
 });
 

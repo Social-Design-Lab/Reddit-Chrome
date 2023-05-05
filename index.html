@@ -16,7 +16,26 @@
     <div class="container mt-3" style="width: 450px;">
         <div id="display" class="row-fluid">
             <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and you will be asked to fill up a pop survey .  In 10 second you will see background color changes!!!</p>
-            
+              <!-- <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and you will be asked to fill up a pop survey .  In 10 second you will see background color changes!!!</p> -->
+              <div class="row" id="btnOptionsDiv">
+                <div class="col d-flex justify-content-end" >
+                <label id="lblHighlight" class="form-label me-3" >Change UI of the page?</label>
+                <select id="btnOptions" class="form-select" style="width: auto;" >
+                    <option>-- More --</option>
+                    <option value="options" selected disabled hidden>Options</option>
+                    <option value="highlight">Highlight</option>
+                    <option value="replaceContent">Replace content</option>
+                    <option value="hideCommentsEveryWhere">Hide comments everywhere</option>
+                    <option value="hideCommentsKeywords">Hide comments with keywords</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col d-flex justify-content-end" id="highlightWindow">
+                <button class="btn btn-primary me-2" id="btnHighlight">Start</button>
+                <button class="btn btn-secondary" id="btnReset">Reset</button>   
+            </div>
+        </div>
         </div>
         <div id="endexp" class="row-fluid">
             <p >The experiment is end. A new tab for post-survey link has opened. If you close the tab accidently, Please right click the Post-survey below and open a new tab. The chrome extension will uninstall itself after 30 seconds. </p>

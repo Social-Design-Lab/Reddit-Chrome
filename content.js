@@ -6,6 +6,16 @@
   // Your code here
 let new_active_triggered =false;
 const title = "A new proof of vaccine is bad for you";
+const likebuttonSelector = '[aria-label="upvote"]';
+const dislikebuttonSelector = '[aria-label="downvote"]';
+const commentTextClassName = '_292iotee39Lmt0MkQZ2hPV';
+const commentLikeclassName = "_1rZYMD_4xY3gRcSS3p8ODO _25IkBM0rRUqWX5ZojEMAFQ _3ChHiOyYyUkpZ_Nm3ZyM2M";
+const bgColorClassName = "uI_hDmU5GSiudtABRz_37";
+//const replyPostClassName ="_22S4OsoDdOqiM-hPTeOURa _2iuoyPiKHN3kfOoeIQalDT _10BQ7pjWbeYP63SAPNS8Ts _3uJP0daPEH2plzVEYyTdaH";
+const filterText = 'Reply';
+const commentSelector ='._292iotee39Lmt0MkQZ2hPV';
+const replyPostButtonSelector ='._22S4OsoDdOqiM-hPTeOURa._2iuoyPiKHN3kfOoeIQalDT._10BQ7pjWbeYP63SAPNS8Ts._3uJP0daPEH2plzVEYyTdaH';
+const replyCommentSelector = "_374Hkkigy4E4srsI2WktEd";
 // below code is make sure even there is no fresh on page ,when user click post on reddit main page the effect still apply
 //chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   //if (request.message === "run_my_code") {
@@ -69,29 +79,33 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
   console.log("change likes to 100: " + response.likeschange1);
   console.log("change likes to 56: " + response.likeschange);
   console.log("change background color to red: " + response.change_bgcolor);
-  console.log("change background color to green: " + response.change_bgcolor_condition2);
+  console.log("change background color to green 2: " + response.change_bgcolor_condition2);
   
   
     //alert("window on load is called");
     if(response.likeschange1)
     {
       //console.log(" change likes");
-      changelikes(100);
+      //changelikes(100);
+      changeLikes(100, commentLikeclassName);
+
     }
     if(response.likeschange)
     {
       
 
-      changelikes(56);
+      //changelikes(56);
+      changeLikes(56, commentLikeclassName);
+
       
     }
     if(response.change_bgcolor)
     {
-      changebg("red");
+      changebg("red",bgColorClassName);
     }
     if(response.change_bgcolor_condition2)
     {
-      changebg("green");
+      changebg("green",bgColorClassName);
     }
     if(response.allbutton_and_activetime)
     {
@@ -110,9 +124,9 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
           alert("we are at fake post page");
           changefakepost_dom();
         }
-        monitor_new_comment();
+        monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         insert_comment();
-        listentobuttons();
+        listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
         
         
       }
@@ -145,92 +159,84 @@ runMyCode();
   
 
 function runMyCode() {
-    // Your code here
-//alert("run my code is called");
-// if user already start exerpeiment , we want to start the experiment when user open a new tab
-chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
-  console.log("All button and Active time: " + response.allbutton_and_activetime);
-  //console.log("Active time start date: " + response.activetime_start_date);
-  console.log("change likes to 100: " + response.likeschange1);
-  console.log("change likes to 56: " + response.likeschange);
-  console.log("change background color to red: " + response.change_bgcolor);
-  console.log("change background color to green: " + response.change_bgcolor_condition2);
-  
-  
-    //alert("window on load is called");
-    if(response.likeschange1)
-    {
-      //console.log(" change likes");
-/*       document.addEventListener('DOMContentLoaded', function() {
-        // Your code here will run when the DOM is fully loaded
-        
-        changelikes(100);
-      }); */
-      changelikes(100);
-    }
-    if(response.likeschange)
-    {
-      
- /*      document.addEventListener('DOMContentLoaded', function() {
-        // Your code here will run when the DOM is fully loaded
-      }); */
-      
-      changelikes(56);
-      
-    }
+  chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
+    console.log("All button and Active time: " + response.allbutton_and_activetime);
+    console.log("change likes to 100: " + response.likeschange1);
+    console.log("change likes to 56: " + response.likeschange);
+    console.log("change background color to red: " + response.change_bgcolor);
+    console.log("change background color to green 1: " + response.change_bgcolor_condition2);
+    
+    
+    
+    // Handle background color changes
     if(response.change_bgcolor)
-    {
-      changebg("red");
+      {changebg("red",bgColorClassName);}
+    
+    console.log("response.change_bgcolor_condition2 is strictly equal to true: ", response.change_bgcolor_condition2 === true);
+    if(response.change_bgcolor_condition2 === true) {
+          console.log("Checking if this is triggered");
+          changebg("green",bgColorClassName);
     }
-    if(response.change_bgcolor_condition2)
-    {
-      changebg("green");
-    }
-    if(response.allbutton_and_activetime)
-    {
+     
+    // Handle like changes
+    if(response.likeschange1)
+     { changeLikes(100,commentLikeclassName);}
+    
+    if(response.likeschange)
+      {changeLikes(56,commentLikeclassName);}
+      
+    
+    
+    
+    // Handle all button and active time
+    if(response.allbutton_and_activetime) {
       console.log("allbutton_and_activetime ");
-      if(new_active_triggered )
-      {
-        
-      }
-      else{
+      
+      if(!new_active_triggered)
         user_active_time();
-      }
+      
       if (location.hostname === "www.reddit.com" && location.pathname === "/") {
         alert("This is the Reddit main page.");
-        //monitor_viewed_post();
-        
       } else {
         alert(`This is not the Reddit main page: ${window.location.href}`);
-        //alert(fakepost_fullUrl);
-        if(window.location.href === fakepost_fullUrl)
-        {
+        
+        if(window.location.href === fakepost_fullUrl) {
           alert("we are at fake post page");
           changefakepost_dom();
         }
-        monitor_new_comment();
+        monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         insert_comment();
-        listentobuttons();
-        
+        listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       }
-     
-      
     }
-
-  
-  
-});
+  });
 }
+
 //});
+// Recursive function to find ancestor with given class name and return elements by class within it
+function findAncestorWithClass(node, targetClassName) {
+  if (node == null) {
+    return null;
+  } else {
+    let elements = node.getElementsByClassName(targetClassName);
+    if (elements && elements.length > 0) {
+      return elements;
+    } else {
+      return findAncestorWithClass(node.parentNode, targetClassName);
+    }
+  }
+}
 
 
-function listentobuttons()
+function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, commentTextClassName) 
+  
 {
-  const upvoteButtons = document.querySelectorAll('[aria-label="upvote"]');
+  const upvoteButtons = document.querySelectorAll(likebuttonSelector);
   upvoteButtons.forEach((button) => {
     if (!button.getAttribute('data-listener-attached')) {
       button.addEventListener('click', () => {
-        var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
+        //var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
+        var post = findAncestorWithClass(button, commentTextClassName);
         var text = post[0].innerText;
         //var uid = get_user_id_from_background();
         if (text=='')
@@ -251,63 +257,61 @@ function listentobuttons()
       button.setAttribute('data-listener-attached', 'true');
     }
   });
-  const downvoteButtons = document.querySelectorAll('[aria-label="downvote"]');
-  downvoteButtons.forEach((button) => {
-    if (!button.getAttribute('data-listener-attached')) {
-      button.addEventListener('click', () => {
-        var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
-        var text = post[0].innerText;
-        if (text=='')
-        {
-          const currentUrl = window.location.href;
-          console.log(`downvote button clicked for post: "${currentUrl}"`);
-          send_votePost_to_background("downvote",currentUrl);
-        }
-        //var uid = get_user_id_from_background();
-        
-        else
-        {
-          console.log(`downvote button clicked for post: "${text}"`);
-          //send_data_to_background("downvote_comment", text);
-          send_voteComment_to_background("downvote",text,window.location.href );
-        }
-      //senddatatodb(uid,"downvote", text);
+  
+  if(dislikebuttonSelector)
+  {
+    const downvoteButtons = document.querySelectorAll(dislikebuttonSelector);
+    downvoteButtons.forEach((button) => {
+      if (!button.getAttribute('data-listener-attached')) {
+        button.addEventListener('click', () => {
+          //var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
+          var post = findAncestorWithClass(button, commentTextClassName);
+          var text = post[0].innerText;
+          if (text=='')
+          {
+            const currentUrl = window.location.href;
+            console.log(`downvote button clicked for post: "${currentUrl}"`);
+            send_votePost_to_background("downvote",currentUrl);
+          }
+          //var uid = get_user_id_from_background();
+          
+          else
+          {
+            console.log(`downvote button clicked for post: "${text}"`);
+            //send_data_to_background("downvote_comment", text);
+            send_voteComment_to_background("downvote",text,window.location.href );
+          }
+        //senddatatodb(uid,"downvote", text);
 
-      });
-      button.setAttribute('data-listener-attached', 'true');
-    }
-  });
+        });
+        button.setAttribute('data-listener-attached', 'true');
+      }
+    });
+  }
 
  
 
 
 }
 // change number of likes function 
-function changelikes(num)
-{
-    //console.log("change likes has been called");
-   
-      // Your code here will run when the DOM is fully loaded
-   
-    
-        // Select all elements with the class "_1rZYMD_4xjzK" (which represents the like button)
-        const likeButtons = document.getElementsByClassName("_1rZYMD_4xY3gRcSS3p8ODO _25IkBM0rRUqWX5ZojEMAFQ _3ChHiOyYyUkpZ_Nm3ZyM2M");
-    
-        //console.log("print out likebuttons length: ");
-        //console.log(likeButtons['length'] );
-        // For each like button, change the text content to the desired number
-        for (let i = 0; i < likeButtons['length']; i++) {
-            likeButtons[i].textContent=num;
-          }
-   
-      
+function changeLikes(num, className) {
+  // Select all elements with the specified class
+  const likeButtons = document.getElementsByClassName(className);
+  
+  // For each like button, change the text content to the desired number
+  for (let i = 0; i < likeButtons.length; i++) {
+      likeButtons[i].textContent = num;
+  }
 }
+
 
 // content.js
 // receive request from background js and call change number likes 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.message === "change_likes") {
-      changelikes(100);
+      //changelikes(100);
+      changeLikes(100, commentLikeclassName);
+
       console.log("Received message from the background script for change likes:", request.message);
       
     }
@@ -316,7 +320,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // conditon 2 change number likes 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "change_likes_condtion2") {
-    changelikes(56);
+    //changelikes(56);
+    changeLikes(56, commentLikeclassName);
+
     console.log("Received message from the background script for change likes:", request.message);
     
   }
@@ -324,7 +330,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.message === "change_bgcolor") {
-      changebg("red");
+      changebg("red",bgColorClassName);
       startSurveyPopup();
         surveyInterval = setInterval(() => {
             startSurveyPopup();
@@ -338,7 +344,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "change_bgcolor_condition2") {
-    changebg("green");
+    changebg("green",bgColorClassName);
     startSurveyPopup();
         surveyInterval = setInterval(() => {
             startSurveyPopup();
@@ -367,9 +373,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           alert("we are at fake post page");
           changefakepost_dom();
         }
-      monitor_new_comment();
+      monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
       insert_comment();
-      listentobuttons();
+      listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       
     }
    
@@ -395,6 +401,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           });
 }); */
 
+
 // fake comments test
 function insert_comment()
 {
@@ -417,27 +424,30 @@ const pElementParent = pElement.parentElement;
 // Remove all other <p> elements
 const allPElements = clonedCommentDiv.querySelectorAll('p');
 allPElements.forEach(element => {
-  pElementParent.removeChild(element);
+  const parentElement = element.parentElement; // get the parent of the current element
+  if (parentElement) { // check if the parent exists
+    parentElement.removeChild(element); // remove the element from its own parent
+  }
 });
 
 // Append the modified pElement back to the parent
 pElementParent.appendChild(pElement);
-
 
 parentContainer.insertBefore(clonedCommentDiv, parentContainer.children[0]);
 
 }
 
 
-function changebg(bgcl)
-{
-    const elements = document.getElementsByClassName("uI_hDmU5GSiudtABRz_37");
 
-    for (let i = 0; i < elements.length; i++) {
-        elements[i].style.backgroundColor = bgcl;
-    }
+function changebg(bgcl, className) {
+  // Select all elements with the specified class
+  const elements = document.getElementsByClassName(className);
+  
+  // For each element, change the background color to the desired color
+  for (let i = 0; i < elements.length; i++) {
+      elements[i].style.backgroundColor = bgcl;
+  }
 }
-
 /// send user actions to backgroun then send to database section
 function send_voteComment_to_background( action, comment, post) {
   chrome.runtime.sendMessage({
@@ -517,32 +527,52 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 // set up user makes  new comments 
-function monitor_new_comment()
+function monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector)
 {
   //_3MknXZVbkWU8JL9XGlzASi
   //console.log("monitor_new_comment is called");
-  
-  const div = document.querySelector('._3MknXZVbkWU8JL9XGlzASi');
-const firstSubmitButtons = div.querySelector('button');
+  // reply to the post 
+  //const div = document.querySelector('._3MknXZVbkWU8JL9XGlzASi');
+const firstSubmitButtons = document.querySelector(replyPostButtonSelector);
+//console.log(firstSubmitButtons);
+//console.log(firstSubmitButtons.hasEventListener);
 //console.log("top submit comments: " ,firstSubmitButtons);
 //const firstSubmitButtons = document.querySelector('button[type="submit"]');
             //console.log(commentSubmitButton);
+            
             if (firstSubmitButtons && !firstSubmitButtons.hasEventListener) {
               firstSubmitButtons.addEventListener('click', function(event) {
                 console.log('Comment submit button clicked!');
-                console.log('My span:', firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
+                let currentNode = firstSubmitButtons;
+
+                // Go up the tree until a node has innerText
+                
+                while (currentNode) {
+                  const childWithTextbox = currentNode.querySelector('[role="textbox"]');
+                  if (childWithTextbox) {
+                    // Found the nearest ancestor with a child having role="textbox"
+                    console.log('Nearest ancestor with textbox:', currentNode);
+                    break;
+                  }
+                  currentNode = currentNode.parentNode;
+                }
+
+                if (!currentNode) {
+                  console.log('No ancestor with textbox found');
+                }
+                console.log('My span:', currentNode.innerText);
                 //var uid =get_user_id_from_background();
                 const post_link =  window.location.href; 
                 //send_data_to_background("insert_comment", firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
-                send_replyPost_to_background(firstSubmitButtons.parentNode.parentNode.parentNode.innerText,post_link );
+                send_replyPost_to_background(currentNode.innerText,post_link );
               });
               // Set flag to indicate that event listener has been added
               firstSubmitButtons.hasEventListener = true;
             }
-//user insert new comments 
+//user reply new comments to the comments in the post 
 
-const allButtons = document.querySelectorAll('button._374Hkkigy4E4srsI2WktEd');
-const replyButtons = Array.from(allButtons).filter(button => button.innerText === "Reply");
+const replyButtons = selectButtonsByClassAndInnerText(replyCommentSelector,filterText);
+
 
 replyButtons.forEach(replyButton => {
   if (replyButton && !replyButton.hasEventListener) 
@@ -560,12 +590,32 @@ replyButtons.forEach(replyButton => {
                 if (commentSubmitButtons && !commentSubmitButtons.hasEventListener) {
                   commentSubmitButtons.addEventListener('click', function(event) {
                     console.log('Comment submit button clicked!');
-                    console.log('My span:', commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
-                    const reply_to = commentSubmitButtons.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV')[0].innerText;
+                    let currentNode = commentSubmitButtons;
+
+                // Go up the tree until a node has innerText
+                console.log(currentNode);
+                while (currentNode) {
+                  const childWithTextbox = currentNode.querySelector('[role="textbox"]');
+                  if (childWithTextbox) {
+                    // Found the nearest ancestor with a child having role="textbox"
+                    console.log('Nearest ancestor with textbox:', currentNode);
+                    break;
+                  }
+                  currentNode = currentNode.parentNode;
+                }
+                    console.log('My span:', currentNode.innerText);
+
+                let current = commentSubmitButtons;
+                while (current && !current.querySelector(commentSelector)) {
+                  current = current.parentNode;
+                }
+                current = current.querySelector(commentSelector);
+
+                    const reply_to = current.innerText;
                     const post_link =  window.location.href; 
                     //var uid =get_user_id_from_background();
                     //send_data_to_background("insert_comment", commentSubmitButtons.parentNode.parentNode.parentNode.innerText);
-                    send_replyComment_to_background(commentSubmitButtons.parentNode.parentNode.parentNode.innerText,reply_to,window.location.href);
+                    send_replyComment_to_background(currentNode.innerText,reply_to,window.location.href);
                   });
                   // Set flag to indicate that event listener has been added
                   commentSubmitButtons.hasEventListener = true;
@@ -582,9 +632,18 @@ replyButtons.forEach(replyButton => {
 });
 }
 
+
+function selectButtonsByClassAndInnerText(className, innerText) {
+  const allButtons = document.querySelectorAll(`button.${className}`);
+  const replyButtons = Array.from(allButtons).filter(button => button.innerText === innerText);
+  return replyButtons;
+}
+
+
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "newcomments_buttons") {
-    monitor_new_comment();
+    monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
     console.log("Received message from the background script for listen new comments:", request.message);
     
   }
@@ -757,20 +816,24 @@ function add_all_event()
       if(response.likeschange1)
       {
         //console.log(" change likes");
-        changelikes(100);
+        //changelikes(100);
+        changeLikes(100, commentLikeclassName);
+
       }
       if(response.likeschange)
       {
         
 
-        changelikes(56);
+       // changelikes(56);
+        changeLikes(56, commentLikeclassName);
+
         
       }
       if(response.allbutton_and_activetime)
       {
         
-          listentobuttons();
-          monitor_new_comment();
+        listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
+        monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         
       }
     });
@@ -787,20 +850,24 @@ function add_all_event()
               if(response.likeschange1)
               {
                 //console.log(" change likes");
-                changelikes(100);
+                //changelikes(100);
+                changeLikes(100, commentLikeclassName);
+
               }
               if(response.likeschange)
               {
                 
           
-                changelikes(56);
+                //changelikes(56);
+                changeLikes(56, commentLikeclassName);
+
                 
               }
               if(response.allbutton_and_activetime)
                 {
                   
-                    listentobuttons();
-                    monitor_new_comment();
+                  listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
+                  monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
                 
                   
                 }

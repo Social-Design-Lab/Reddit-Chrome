@@ -24,7 +24,8 @@
       "activeTab",
       "identity",
       "storage",
-      "scripting"
+      "scripting",
+      "https://raw.githubusercontent.com/"
     ],
     "host_permissions": ["https://redditchrome.herokuapp.com/"]
   }

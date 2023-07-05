@@ -1,0 +1,145 @@
+smq-popup {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    display: block;
+  }
+  
+  smq-popup .window {
+    padding: 10px 20px 20px;
+    margin: 150px auto;
+    width: 500px;
+    min-height: 100px;
+    background: rgba(255,255,255,1);
+    border-radius: 10px;
+  }
+  
+  smq-popup .close {
+    margin: 0 10px 0 0;
+    float: right;
+    color: rgba(200,200,200,1);
+    font-size: 20px;
+    cursor: pointer;
+    font-family: sans-serif;
+  }
+  
+  smq-popup header.api-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-scale {
+    min-width: 44px;
+    width: 6%;
+    text-align: center;
+    font-weight: bold;
+    color: black;
+    font-family: 'Lato', sans-serif;
+  }
+  
+  .btn-scale-asc-1, .btn-scale-desc-10 {
+    background-color: #33FF00;
+  }
+  
+  .btn-scale-asc-1:hover,
+  .btn-scale-desc-10:hover {
+    background-color: #2CDE00;
+  }
+  
+  .btn-scale-asc-2,
+  .btn-scale-desc-9{
+    background-color: #66FF00;
+  }
+  
+  .btn-scale-asc-2:hover,
+  .btn-scale-desc-9:hover{
+    background-color: #59DE00;
+  }
+  
+  .btn-scale-asc-3,
+  .btn-scale-desc-8 {
+    background-color: #99FF00;
+  }
+  
+  .btn-scale-asc-3:hover,
+  .btn-scale-desc-8:hover {
+    background-color: #85DE00;
+  }
+  
+  .btn-scale-asc-4,
+  .btn-scale-desc-7 {
+    background-color: #CCFF00;
+  }
+  
+  .btn-scale-asc-4:hover,
+  .btn-scale-desc-7:hover {
+    background-color: #B1DE00;
+  }
+  
+  .btn-scale-asc-5,
+  .btn-scale-desc-6 {
+    background-color: #FFFF00;
+  }
+  
+  .btn-scale-asc-5:hover,
+  .btn-scale-desc-6:hover {
+    background-color: #DEDE00;
+  }
+  
+  .btn-scale-asc-6,
+  .btn-scale-desc-5 {
+    background-color: #FFCC00;
+  }
+  
+  .btn-scale-asc-6:hover,
+  .btn-scale-desc-5:hover {
+    background-color: #DEB100;
+  }
+  
+  .btn-scale-asc-7,
+  .btn-scale-desc-4 {
+    background-color: #FF9900;
+  }
+  
+  .btn-scale-asc-7:hover,
+  .btn-scale-desc-4:hover {
+    background-color: #DE8500;
+  }
+  
+  .btn-scale-asc-8,
+  .btn-scale-desc-3 {
+    background-color: #FF6600;
+  }
+  
+  .btn-scale-asc-8:hover,
+  .btn-scale-desc-3:hover {
+    background-color: #DE5900;
+  }
+  
+  .btn-scale-asc-9,
+  .btn-scale-desc-2 {
+    background-color: #FF3300;
+  }
+  
+  .btn-scale-asc-9:hover,
+  .btn-scale-desc-2:hover {
+    background-color: #DE2C00;
+  }
+  
+  .btn-scale-asc-10,
+  .btn-scale-desc-1 {
+    background-color: #FF0000;
+  }
+  
+  .btn-scale-asc-10:hover,
+  .btn-scale-desc-1:hover {
+    background-color: #DE0000;
+  }
+
+  .highlight {
+    background-color: blueviolet;
+  }
+   

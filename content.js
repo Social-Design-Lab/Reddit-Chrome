@@ -17,8 +17,10 @@ const commentSelector ='._292iotee39Lmt0MkQZ2hPV';
 const replyPostButtonSelector ='._22S4OsoDdOqiM-hPTeOURa._2iuoyPiKHN3kfOoeIQalDT._10BQ7pjWbeYP63SAPNS8Ts._3uJP0daPEH2plzVEYyTdaH';
 const replyCommentSelector = "_374Hkkigy4E4srsI2WktEd";
 const ButtonColorClass = "_8dpZTfzgKPKCUTjp9SAn1";
-const fakeCommnetContent =" THIS IS A FAKE COMMENT"; 
-const fakeCommentUserName = "Experimental Team"
+let fakeCommnetContent =" THIS IS A FAKE COMMENT"; 
+let fakeCommentUserName = "Experimental Team";
+let parentContainer = document.querySelector('div._1YCqQVO-9r-Up6QPB9H6_4');
+let fakeCommentInsertIndex =0;
 // below code is make sure even there is no fresh on page ,when user click post on reddit main page the effect still apply
 //chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   //if (request.message === "run_my_code") {
@@ -128,7 +130,8 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
           changefakepost_dom();
         }
         monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
-        insert_comment(likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+        //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+        read_csv();
         //likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector
         listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
         
@@ -210,7 +213,8 @@ function runMyCode() {
         }
         monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         //insert_comment(likebuttonSelector,dislikebuttonSelector,likeDislikeButtonColorClass,commentTextClassName,replyCommentSelector);
-        insert_comment(likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+        //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+        read_csv();
         listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       }
     }
@@ -380,7 +384,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         }
       monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
       //insert_comment(likebuttonSelector,dislikebuttonSelector,likeDislikeButtonColorClass,commentTextClassName,replyCommentSelector);
-      insert_comment(likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+      //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+      read_csv();
       listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       
     }
@@ -409,9 +414,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 // fake comments test
-function insert_comment(likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector)
+function insert_comment(parentContainer, likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector)
 {
-const parentContainer = document.querySelector('div._1YCqQVO-9r-Up6QPB9H6_4');
+
 const commentDiv = document.querySelector('div.Comment');
 const clonedCommentDiv = commentDiv.cloneNode(true);
 
@@ -488,7 +493,7 @@ userSubmitButtonInFakeCommnet.addEventListener('click', function() {
   const userReplyInFake = replyInput.innerText;
   send_replyComment_to_background(userReplyInFake,fakeCommnetContent,window.location.href);
   // Perform actions with the reply content
-  alert(userReplyInFake);
+  //alert(userReplyInFake);
   //let insertUsersCommentToFakeComment = newComment; 
   
 
@@ -726,7 +731,7 @@ allPElements.forEach(element => {
 pElementParent.appendChild(pElement);
 
 //parentContainer.insertBefore(clonedCommentDiv, parentContainer.children[0]);
-parentContainer.insertBefore(newComment, parentContainer.children[0]);
+parentContainer.insertBefore(newComment, parentContainer.children[fakeCommentInsertIndex]);
 
 }
 
@@ -1776,6 +1781,51 @@ chrome.tabs.insertCSS(tabId, {
 });
 
 
+function read_csv ()
+{
+  fetch('https://raw.githubusercontent.com/Social-Design-Lab/Reddit-Chrome/main/fake_comment.csv')
+  .then(response => response.text())
+  .then(csvData => {
+    // Parse the CSV data
+    const rows = csvData.split('\n');
+      const headers = rows[0].split(',');
+
+      for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(',');
+
+      // Create an object using the column names as keys
+      const rowData = {
+        user_name: values[0],
+        content: values[1],
+        where_to_insert: values[2],
+        post_url: values[3].trim() 
+      };
+      fakeCommentUserName = rowData.user_name;
+      fakeCommnetContent= rowData.content;
+      fakeCommentInsertIndex = rowData.where_to_insert;
+      //alert(window.location.href ,rowData.post_url );
+      if (window.location.href === rowData.post_url) {
+        // The current page URL matches the post_url
+        console.log('Current page matches the post URL');
+        insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
+      } else {
+        // The current page URL does not match the post_url
+        console.log(window.location.href);
+        console.log(rowData.post_url);
+        console.log('Current page does not match the post URL');
+      }
+
+      // Process the current row data
+      console.log(rowData);
+
+      // You can perform any desired operations on rowData here
+    }
+  })
+  .catch(error => {
+    console.error('Error reading the CSV file:', error);
+  });
+
+}
 
 
 

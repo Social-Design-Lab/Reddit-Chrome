@@ -134,6 +134,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     
 
     insertdata(userpid);
+    read_csv(userpid);
     console.log(`Background Received user ID from timer js: ${message.userId}`);
   }
 });
@@ -451,6 +452,8 @@ function insertdata(uid)
       browser_history:[],
       active_onReddit:[], 
       surveypopup_selections:[] ,
+      fake_comment:[],
+      user_reply_tofakecomment:[],
     })
   })
   .then(response => {
@@ -501,6 +504,92 @@ function insertUserVoteComments(uid, action, comment, post) {
     console.error(error);
   });
 }
+
+
+/// insert fake comments into database 
+
+function insertFakeComments(uid, comment_id, user_name, comment_content, insert_index,post_url) {
+  const insert_date = new Date();
+  fetch("https://redditchrome.herokuapp.com/api/updateFakeComment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      fake_comment: [{
+        fake_comment_id: comment_id,
+        user_name: user_name,
+        content: comment_content, 
+        where_to_insert: insert_index,
+        post_url:post_url
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert fake comments on comments ");
+    }
+  })
+  .then(data => {
+    console.log("fake comments inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === "insert user reply in fake comments to db") {
+    
+    // Process the variables received from the content script
+    insertUserReplyFakeComments(userpid,request.commentId,  request.userRedditName,request.commentContent );
+    // Send a response back to the content script if needed
+    sendResponse({ success: true });
+  }
+});
+
+
+
+
+
+// user reply to fake comments 
+function insertUserReplyFakeComments(uid, comment_id, userRedditName, comment_content) {
+  //const insert_date = new Date();
+  fetch("https://redditchrome.herokuapp.com/api/updateUserReplyToFakeComment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      user_reply_tofakecomment: [{
+        fake_comment_id: comment_id,
+        userRedditName: userRedditName,
+        userReplyInFake: comment_content, 
+        
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert user reply to fake comments ");
+    }
+  })
+  .then(data => {
+    console.log("user reply fake comments inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+
+
 // update the user action, reply a post
 function insertUserReplyPosts(uid, content, post) {
   const insert_date = new Date();
@@ -1058,3 +1147,42 @@ if (message.message === "send_question_data_from_timerjs") {
     insertQuestiondata(message.data, userpid);
 }
 });
+
+
+
+function read_csv (userpid)
+{
+  fetch('fake_comment.csv')
+  .then(response => response.text())
+  .then(csvData => {
+    // Parse the CSV data
+    const rows = csvData.split('\n');
+      const headers = rows[0].split(',');
+
+      for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(',');
+
+      // Create an object using the column names as keys
+      const rowData = {
+        fake_comment_id:values[0],
+        user_name: values[1],
+        content: values[2],
+        where_to_insert: values[3],
+        post_url: values[4].trim() 
+      };
+      
+      //alert(window.location.href ,rowData.post_url );
+      insertFakeComments(userpid, rowData.fake_comment_id,rowData.user_name,rowData.content,rowData.where_to_insert, rowData.post_url);
+      // Process the current row data
+      console.log(rowData);
+
+      // You can perform any desired operations on rowData here
+    }
+  })
+  .catch(error => {
+    console.error('Error reading the CSV file:', error);
+  });
+
+}
+
+

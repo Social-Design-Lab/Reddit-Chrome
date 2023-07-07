@@ -20,7 +20,8 @@ const ButtonColorClass = "_8dpZTfzgKPKCUTjp9SAn1";
 let fakeCommnetContent =" THIS IS A FAKE COMMENT"; 
 let fakeCommentUserName = "Experimental Team";
 let parentContainer = document.querySelector('div._1YCqQVO-9r-Up6QPB9H6_4');
-let fakeCommentInsertIndex =0;
+let fakeCommentInsertIndex =-1;
+let fakecommentID = -1;
 // below code is make sure even there is no fresh on page ,when user click post on reddit main page the effect still apply
 //chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   //if (request.message === "run_my_code") {
@@ -131,7 +132,8 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
         }
         monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
-        read_csv();
+        //read_csv();
+        read_fakecomment_from_database();
         //likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector
         listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
         
@@ -214,7 +216,8 @@ function runMyCode() {
         monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         //insert_comment(likebuttonSelector,dislikebuttonSelector,likeDislikeButtonColorClass,commentTextClassName,replyCommentSelector);
         //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
-        read_csv();
+        //read_csv();
+        read_fakecomment_from_database();
         listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       }
     }
@@ -385,7 +388,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
       //insert_comment(likebuttonSelector,dislikebuttonSelector,likeDislikeButtonColorClass,commentTextClassName,replyCommentSelector);
       //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
-      read_csv();
+      //read_csv();
+      read_fakecomment_from_database();
       listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       
     }
@@ -512,6 +516,17 @@ insertUsersCommentToFakeComment.innerHTML =`<div><div><div><div id="t1_jph4rri" 
   //const wheretoinsert = document.getElementById('wheretoinsert');
   wheretoinsert.removeChild(replyContainer);
   wheretoinsert.appendChild(insertUsersCommentToFakeComment);
+
+  // Assuming you have the variables comment_id, userRedditName, and comment_content
+chrome.runtime.sendMessage({
+  message: "insert user reply in fake comments to db",
+  commentId: fakecommentID,
+  userRedditName: userRedditName,
+  commentContent: userReplyInFake
+}, function(response) {
+  // Handle the response from the background script if needed
+});
+
   //const fakeCommnetContent = temp; 
 });
 
@@ -732,6 +747,71 @@ pElementParent.appendChild(pElement);
 
 //parentContainer.insertBefore(clonedCommentDiv, parentContainer.children[0]);
 parentContainer.insertBefore(newComment, parentContainer.children[fakeCommentInsertIndex]);
+
+
+chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
+  const userpid = response.value;
+  console.log("Received userpid from background script:", userpid);
+  fetch(`https://redditchrome.herokuapp.com/api/user_reply_tofakecomment?userid=${userpid}`)
+    .then(response => response.json())
+    .then(data => {
+      // Check if the data contains the expected structure
+      if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].user_reply_tofakecomment)) {
+        const userReplyToFakeComment = data[0].user_reply_tofakecomment;
+        console.log("User reply to fake comment retrieved successfully:", userReplyToFakeComment);
+
+        // Process each user reply to fake comment
+        userReplyToFakeComment.forEach(reply => {
+          // Access the properties of each reply
+          const { fake_comment_id, userRedditName, userReplyInFake } = reply;
+          console.log("Fake comment ID:", fake_comment_id);
+          console.log("User Reddit Name:", userRedditName);
+          console.log("User Reply in Fake:", userReplyInFake);
+          if(fake_comment_id == fakecommentID)
+          {
+            // insert user reply in fake comment into fake comment 
+            const wheretoinsert = newComment.querySelector('._3tw__eCCe7j-epNCKGXUKk');
+            if (wheretoinsert) {
+              console.log('Target element found.');
+              
+            
+             
+    
+          // Get the content of replyInput
+         
+          //send_replyComment_to_background(userReplyInFake,fakeCommnetContent,window.location.href);
+          // Perform actions with the reply content
+          //alert(userReplyInFake);
+          //let insertUsersCommentToFakeComment = newComment; 
+          
+        
+          let insertUsersCommentToFakeComment = document.createElement('div');
+        
+          // Select the element with class name "_2BMnTatQ5gjKGK5OWROgaG"
+        
+        
+        
+                // You would have to inspect an existing comment to replicate its structure and classes
+        insertUsersCommentToFakeComment.innerHTML =`<div><div><div><div id="t1_jph4rri" style="padding-left:16px" tabindex="-1" class="_3sf33-9rVAO_v4y0pIW_CH"><div class="_1DooEIX-1Nj5rweIc5cw_E"><div class="_3Wv3am0TXfTcugZJ6niui"><div class="_36AIN2ppxy_z-XSDxTvYj5 t1_jph4rri undefined"><i class="threadline"></i></div></div></div><div class="Comment t1_jph4rri P8SGAKMtRxNwlmLz1zdJu HZ-cv9q391bm8s7qT54B3 _1z5rdmX8TDr6mqwNv7A70U"><button class="_1nGapmdexvR0BuOkfAi6wa t1_jph4rri _1zN1-lYh2LfbYOMAho_O8g _2Gzh48SaLz7dQBCULfOC6V"><i class="icon icon-expand _1tnrhhM9S7dYjApTfvd14l"></i></button><div class="_2mHuuvyV9doV3zwbZPtIPG ZvAy-PJfJmB8pzQxpz1sS"><div id="AvatarUserInfoTooltip--t1_jph4rri"><a class="_3GfQMgsm3HGd3838lwqCST" data-testid="comment_author_icon" href="/user/nolij420/"><div class="_2p14AQvJBvTrEEa4csiW9v "><img alt="User avatar" class="_2TN8dEgAQbSyKntWpSPYM7 _13ScjOmi6dGdJw0JAonQEr " src="https://www.redditstatic.com/avatars/avatar_default_02_24A0ED.png"><span></span></div></a></div></div><div class="_3tw__eCCe7j-epNCKGXUKk"><span class="_1RIl585IYPW6cmNXwgRz0J">level 1</span><div class="-Xcv3XBXmgiY2X5RqaPbO _1S45SPAIb30fsXtEcKPSdt _3LqBzV8aCO9tge99jHiUGy " data-testid="post-comment-header"><span class="_1a_HxF03jCyxnx706hQmJR"><div class="_3QEK34iVL1BjyHAVleVVNQ"><div class="_2mHuuvyV9doV3zwbZPtIPG"><div id="UserInfoTooltip--t1_jph4rri"><a class="wM6scouPXXsFDSZmZPHRo DjcdNGtVXPcxG0yiFXIoZ _23wugcdiaj44hdfugIAlnX " data-testid="comment_author_link" href="/user/nolij420/">${userRedditName}</a></div></div></div><span class="_3NdKulBcLHFmpKDAy9Barm _2a_XgY10KOzM0PRvywwDuY" data-testid="achievement-flairs"><img alt="All-Time Top 100 Poster" class="_2Xc055D-KCIUe6f2E3Ghgr" src="https://www.redditstatic.com/gold/achievement_flairs/posts_2_120.png"><span class="_1zxdGxj6UKKqJMibObCbeA">+4</span></span><span class="_2ETuFsVzMBxiHia6HfJCTQ _8b8fUdBRxCYj9MkNpFvvv"> · </span><a class="_3yx4Dn0W3Yunucf5sVJeFU" data-testid="comment_timestamp" href="https://www.reddit.com/r/orlando/comments/14ioh2s/comment/jph4rri/?utm_source=reddit&amp;utm_medium=web2x&amp;context=3" id="CommentTopMeta--Created--t1_jph4rri" target="_blank" rel="nofollow noopener noreferrer">1 day ago</a><div class="_3XoW0oYd5806XiOr24gGdb"></div></span></div><div data-testid="comment" class="_3cjCphgls6DH-irkVaA0GM "><div class="_292iotee39Lmt0MkQZ2hPV RichTextJSON-root"><p class="_1qeIAgB0cPwnLhDF9XSiJM">${userReplyInFake}</p></div></div><div class="_3KgrO85L1p9wQbgwG27q4y"><div class="_1E9mcoVn4MYnuBQSVDt1gC _2oM1YqCxIwkvwyeZamWwhW _1ewTEGuogtFmDvDII2T2Yy" id="vote-arrows-t1_jph4rri"><button aria-label="upvote" aria-pressed="false" data-click-id="upvote" data-adclicklocation="upvote" class="_2k73nZrjAYiwAj9hv7K-kq  _22nWXKAY6OzAfK5GcUqWV2" style="--verticalvotes-customupvote-active:url(https://styles.redditmedia.com/t5_2qh7s/styles/postUpvoteIconActive_wpyq4wbvuam61.PNG);--verticalvotes-customupvote-inactive:url(https://styles.redditmedia.com/t5_2qh7s/styles/postUpvoteIconInactive_fuyuuzpuuam61.PNG)" data-listener-attached="false"></button><div class="_1rZYMD_4xY3gRcSS3p8ODO _25IkBM0rRUqWX5ZojEMAFQ _3ChHiOyYyUkpZ_Nm3ZyM2M" style="color:#1A1A1B">56</div><button aria-label="downvote" aria-pressed="false" data-click-id="downvote" data-adclicklocation="downvote" class="ceU_3ot04pOVIcrrXH9fY  _783RL1AYIib59nxLCXhgv" style="--verticalvotes-customdownvote-active:url(https://styles.redditmedia.com/t5_2qh7s/styles/postDownvoteIconActive_lzcp1idwuam61.PNG);--verticalvotes-customdownvote-inactive:url(https://styles.redditmedia.com/t5_2qh7s/styles/postDownvoteIconInactive_rd3dm4tvuam61.PNG)" data-listener-attached="true"></button></div><div class="XZK-LTFT5CgGo9MvPQQsy _1LXnp2ufrzN6ioaTLTjGQ1 _2t8wLytikHzPCUnvXdS_wu _2hXOR2fIcfnUg0p-Env7KQ _3rHRwVOKmBBlBOQ4kIW_vq _2_lhaFUJdP8q0o2L9MN2TN"><button class="_374Hkkigy4E4srsI2WktEd"><i class="icon icon-comment _1g4YvNNIFoV_5_EhsVfyRy"></i>Reply</button><button class="_374Hkkigy4E4srsI2WktEd _2hr3tRWszeMRQ0u_Whs7t8 _14hLFU5cIJCyxH9DSgsCov">Give Award</button><div id="t1_jph4rri-comment-share-menu"><button class="_374Hkkigy4E4srsI2WktEd">Share</button></div><button class="_374Hkkigy4E4srsI2WktEd _2hr3tRWszeMRQ0u_Whs7t8 _14hLFU5cIJCyxH9DSgsCov">Report</button><button class="_374Hkkigy4E4srsI2WktEd _2hr3tRWszeMRQ0u_Whs7t8 _14hLFU5cIJCyxH9DSgsCov">Save</button><button class="_374Hkkigy4E4srsI2WktEd _2hr3tRWszeMRQ0u_Whs7t8 _14hLFU5cIJCyxH9DSgsCov">Follow</button><div class="hrV8gUgmt0V7wM2wgZ81l _1YnPvd-E5MbmcM3PvRRcX _14hLFU5cIJCyxH9DSgsCov"><button aria-expanded="false" aria-haspopup="true" aria-label="more options" id="t1_jph4rri-overflow-menu" data-adclicklocation="overflow_menu" class="_2pFdCpgBihIaYh9DSMWBIu _1VR6DV38j4rMT5OMeU4gJZ uMPgOFYlCc5uvpa2Lbteu"><i class="_38GxRFSqSC-Z2VLi5Xzkjy icon icon-overflow_horizontal"></i></button></div></div></div></div></div></div></div></div></div>`; 
+        // Change the content of the <p> element
+          //insertUsersCommentToFakeComment = insertUsersCommentToFakeComment.replaceAll(fakeCommnetContent, userReplyInFake);
+          
+          // Remove the replyContainer from its parent
+          //const wheretoinsert = document.getElementById('wheretoinsert');
+          //wheretoinsert.removeChild(replyContainer);
+          wheretoinsert.appendChild(insertUsersCommentToFakeComment);
+
+
+            }
+          }
+          // Proceed with further actions using the user reply data
+        });
+      } else {
+        console.error("Invalid data format received");
+      }
+    })
+    .catch(error => console.error('Error:', error));
+});
 
 }
 
@@ -1780,52 +1860,71 @@ chrome.tabs.insertCSS(tabId, {
   file: 'popup.css'
 });
 
-
-function read_csv ()
+function read_fakecomment_from_database ()
 {
-  fetch('https://raw.githubusercontent.com/Social-Design-Lab/Reddit-Chrome/main/fake_comment.csv')
-  .then(response => response.text())
-  .then(csvData => {
-    // Parse the CSV data
-    const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-
-      for (let i = 1; i < rows.length; i++) {
-        const values = rows[i].split(',');
-
-      // Create an object using the column names as keys
-      const rowData = {
-        user_name: values[0],
-        content: values[1],
-        where_to_insert: values[2],
-        post_url: values[3].trim() 
-      };
-      fakeCommentUserName = rowData.user_name;
-      fakeCommnetContent= rowData.content;
-      fakeCommentInsertIndex = rowData.where_to_insert;
-      //alert(window.location.href ,rowData.post_url );
-      if (window.location.href === rowData.post_url) {
-        // The current page URL matches the post_url
-        console.log('Current page matches the post URL');
-        insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
-      } else {
-        // The current page URL does not match the post_url
-        console.log(window.location.href);
-        console.log(rowData.post_url);
-        console.log('Current page does not match the post URL');
-      }
-
-      // Process the current row data
-      console.log(rowData);
-
-      // You can perform any desired operations on rowData here
-    }
-  })
-  .catch(error => {
-    console.error('Error reading the CSV file:', error);
+  chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
+    const userpid = response.value;
+    console.log("Received userpid from background script:", userpid);
+    fetch(`https://redditchrome.herokuapp.com/api/fake_comments?userid=${userpid}`)
+      .then(response => response.json())
+      .then(data => {
+        // Check if the data contains the expected structure
+        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_comment)) {
+          const fakeComments = data[0].fake_comment;
+          console.log("Fake comments retrieved successfully:", fakeComments);
+    
+          // Process each fake comment
+          fakeComments.forEach(comment => {
+            // Access the properties of each comment
+            const { fake_comment_id, user_name, content, where_to_insert, post_url } = comment;
+            console.log("Fake comment ID:", fake_comment_id);
+            console.log("User name:", user_name);
+            console.log("Content:", content);
+            console.log("Where to insert:", where_to_insert);
+            console.log("Post URL:", post_url);
+            
+            if (window.location.href === post_url) {
+              // The current page URL matches the post_url
+              console.log('Current page matches the post URL');
+              fakecommentID = fake_comment_id; 
+              fakeCommentInsertIndex = where_to_insert; 
+              fakeCommentUserName = user_name; 
+              fakeCommnetContent = content; 
+              insert_comment(parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+            } else {
+              // The current page URL does not match the post_url
+              //console.log(window.location.href);
+              //console.log(rowData.post_url);
+              console.log('Current page does not match the post URL');
+            }
+            // Proceed with further actions using the decoded data
+          });
+        } else {
+          console.error("Invalid data format received");
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  
+    // Proceed with further actions using the userpid
   });
-
+  
 }
 
+
+
+
+
+
+/* if (window.location.href === rowData.post_url) {
+  // The current page URL matches the post_url
+  console.log('Current page matches the post URL');
+  insert_comment(parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+} else {
+  // The current page URL does not match the post_url
+  console.log(window.location.href);
+  console.log(rowData.post_url);
+  console.log('Current page does not match the post URL');
+}
+ */
 
 

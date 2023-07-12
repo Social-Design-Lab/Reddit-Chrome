@@ -452,6 +452,7 @@ function insertdata(uid)
       browser_history:[],
       active_onReddit:[], 
       surveypopup_selections:[] ,
+      fake_post:[],
       fake_comment:[],
       user_reply_tofakecomment:[],
     })
@@ -540,6 +541,42 @@ function insertFakeComments(uid, comment_id, user_name, comment_content, insert_
     console.error(error);
   });
 }
+
+
+// insert fakepost
+function insertFakePosts(uid, fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image) {
+  const insert_date = new Date();
+  fetch("https://redditchrome.herokuapp.com/api/updateFakePost", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      fake_post: [{
+        fakepost_url: fakepost_url,
+        fakepost_index: fakepost_index,
+        fakepost_title: fakepost_title,
+        fakepost_content: fakepost_content,
+        fakepost_image: fakepost_image
+      }]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Failed to insert fake post");
+    }
+  })
+  .then(data => {
+    console.log("Fake post inserted successfully:", data);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === "insert user reply in fake comments to db") {
@@ -1152,6 +1189,8 @@ if (message.message === "send_question_data_from_timerjs") {
 
 function read_csv (userpid)
 {
+
+  // insert fake comments 
   fetch('fake_comment.csv')
   .then(response => response.text())
   .then(csvData => {
@@ -1183,6 +1222,42 @@ function read_csv (userpid)
     console.error('Error reading the CSV file:', error);
   });
 
-}
 
+// insert fake posts 
+
+
+fetch('fakepost.csv')
+  .then(response => response.text())
+  .then(csvData => {
+    // Parse the CSV data
+    const rows = csvData.split('\n');
+      const headers = rows[0].split(',');
+
+      for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(',');
+
+      // Create an object using the column names as keys
+      const rowData = {
+        fakepost_url:values[0].trim() ,
+        fakepost_index: values[1],
+        fakepost_title: values[2],
+        fakepost_content: values[3],
+        fakepost_image: values[4].trim() 
+      };
+      
+      //alert(window.location.href ,rowData.post_url );
+      insertFakePosts(userpid, rowData.fakepost_url,rowData.fakepost_index,rowData.fakepost_title,rowData.fakepost_content, rowData.fakepost_image);
+      // Process the current row data
+      console.log(rowData);
+
+      // You can perform any desired operations on rowData here
+    }
+  })
+  .catch(error => {
+    console.error('Error reading the CSV file:', error);
+  });
+
+
+
+}
 

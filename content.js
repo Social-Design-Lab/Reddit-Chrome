@@ -412,7 +412,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 // fake comments test
-function insert_comment(parentContainer, likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector)
+function insert_comment(idofcomment, parentContainer, likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector)
 {
 
 const commentDiv = document.querySelector('div.Comment');
@@ -761,7 +761,7 @@ chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (res
           console.log("Fake comment ID:", fake_comment_id);
           console.log("User Reddit Name:", userRedditName);
           console.log("User Reply in Fake:", userReplyInFake);
-          if(fake_comment_id == fakecommentID)
+          if(fake_comment_id == idofcomment)
           {
             // insert user reply in fake comment into fake comment 
             const wheretoinsert = newComment.querySelector('._3tw__eCCe7j-epNCKGXUKk');
@@ -1870,7 +1870,7 @@ function read_fakecomment_from_database ()
               fakeCommentInsertIndex = where_to_insert; 
               fakeCommentUserName = user_name; 
               fakeCommnetContent = content; 
-              insert_comment(parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+              insert_comment(fakecommentID, parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
             } else {
               // The current page URL does not match the post_url
               //console.log(window.location.href);

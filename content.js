@@ -125,12 +125,12 @@ chrome.runtime.sendMessage({ message: "get_all_setup" }, function(response) {
         console.log(`This is not the Reddit main page: ${window.location.href}`);
        // alert(fakepost_fullUrl);
         
-          changefakepost_dom();
-        
+         // changefakepost_dom();
+         read_fakecomment_from_database();
         monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
         //read_csv();
-        read_fakecomment_from_database();
+        
         //likebuttonSelector, dislikebuttonSelector=null,ButtonColorClass, commentTextClassName,commentLikeclassName,replyCommentSelector
         listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
         
@@ -207,13 +207,13 @@ function runMyCode() {
         console.log(`This is not the Reddit main page: ${window.location.href}`);
         
        
-          changefakepost_dom();
-        
+          //changefakepost_dom();
+          read_fakecomment_from_database();
         monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
         //insert_comment(likebuttonSelector,dislikebuttonSelector,likeDislikeButtonColorClass,commentTextClassName,replyCommentSelector);
         //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
         //read_csv();
-        read_fakecomment_from_database();
+        //read_fakecomment_from_database();
         listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       }
     }
@@ -377,13 +377,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       //alert(fakepost_fullUrl);
 
       
-          changefakepost_dom();
-        
+         // changefakepost_dom();
+         read_fakecomment_from_database(); 
       monitor_new_comment(replyPostButtonSelector,replyCommentSelector,filterText , commentSelector);
       //insert_comment(likebuttonSelector,dislikebuttonSelector,likeDislikeButtonColorClass,commentTextClassName,replyCommentSelector);
       //insert_comment(parentContainer,likebuttonSelector,dislikebuttonSelector,ButtonColorClass, commentTextClassName,commentLikeclassName, replyCommentSelector);
       //read_csv();
-      read_fakecomment_from_database();
+      //read_fakecomment_from_database();
       listentobuttons(likebuttonSelector,dislikebuttonSelector,commentTextClassName);
       
     }
@@ -1339,83 +1339,6 @@ function fakepost()
 }
 
 
-function changefakepost_dom ()
-{
-  //const h1_element = document.querySelector('h1');
-  //h1_element.textContent = title; 
-
-
-  chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
-    const userpid = response.value;
-    console.log("Received userpid from background script:", userpid);
-    fetch(`https://redditchrome.herokuapp.com/api/fake_posts?userid=${userpid}`)
-      .then(response => response.json())
-      .then(data => {
-        // Check if the data contains the expected structure
-        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_post)) {
-          const fakePosts = data[0].fake_post;
-          console.log("Fake post retrieved successfully:", fakePosts);
-    
-          // Process each fake comment
-          fakePosts.forEach(post => {
-            // Access the properties of each comment
-            const { fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image } = post;
-            
-            
-            if (window.location.href === fakepost_url) 
-            {
-              // The current page URL matches the post_url
-              console.log('Current page matches the post URL in change fake post dom');
-
-              // Find the element with the specified class name
-              const element = document.querySelector('._1oQyIsiPHYt6nx7VOmd1sz');
-
-              // Replace its inner HTML
-              if (element) {
-                element.innerHTML = `<div class="_1oQyIsiPHYt6nx7VOmd1sz _2rszc84L136gWQrkwH6IaM  Post t3_12s1gu9 " data-testid="post-container" id="t3_12s1gu9" tabindex="-1" data-adclicklocation="background"><div data-test-id="post-content"><div class="_23h0-EcaBUorIHC-JZyh6J" style="width:40px;border-left:4px solid transparent"><div class="_1E9mcoVn4MYnuBQSVDt1gC" id="vote-arrows-t3_12s1gu9"><button aria-label="upvote" aria-pressed="false" class="voteButton " data-click-id="upvote" data-adclicklocation="upvote" id="upvote-button-t3_12s1gu9"><span class="_2q7IQ0BUOWeEZoeAxN555e _3SUsITjKNQ7Tp0Wi2jGxIM qW0l8Af61EP35WIG6vnGk _3edNsMs0PNfyQYofMNVhsG"><i class="icon icon-upvote _2Jxk822qXs4DaXwsN7yyHA"></i></span></button><div class="_1rZYMD_4xY3gRcSS3p8ODO _3a2ZHWaih05DgAOtvu6cIo _2iiIcja5xIjg-5sI4ECvcV" style="color:#1A1A1B">155</div><button aria-label="downvote" aria-pressed="false" class="voteButton" data-click-id="downvote" data-adclicklocation="downvote"><span class="_1iKd82bq_nqObFvSH1iC_Q Q0BxYHtCOJ_rNSPJMU2Y7 _2fe-KdD2OM0ciaiux-G1EL _3yQIOwaIuF6gn8db96Gu7y"><i class="icon icon-downvote ZyxIIl4FP5gHGrJDzNpUC"></i></span></button></div></div><div class="_14-YvdFiW5iVvfe5wdgmET"><div class="cZPZhMe-UCZ8htPodMyJ5"><div class="_3AStxql1mQsrZuUIFP9xSg nU4Je7n-eSXStTBAPMYt8" data-adclicklocation="top_bar"><span style="color:#787C7E" class="_2fCzxBE1dlMh4OFc7B3Dun">Posted by</span><div class="_2mHuuvyV9doV3zwbZPtIPG"><div id="UserInfoTooltip--t3_12s1gu9"><a class="_2tbHP6ZydRpjI44J3syuqC  _23wugcdiaj44hdfugIAlnX oQctV4n0yUb0uiHDdGnmE" data-click-id="user" data-testid="post_author_link" href="/user/thanbini/" style="color: rgb(120, 124, 126);">u/thanbini</a></div></div><span class="_2VF2J19pUIMSLJFky-7PEI" data-testid="post_timestamp" data-click-id="timestamp" style="color:#787C7E">3 months ago</span></div><div class="_2wFk1qX4e1cxk8Pkw1rAHk"></div><div class="_3XoW0oYd5806XiOr24gGdb"></div></div><button class="_3KTYozwt91D81Yub-OQ4S3"><i class="SDzveG4fJf98RLE5vll2w icon icon-notification" aria-label="Follow post to stay updated"></i></button></div><div class="_2FCtq-QzlfuN-SwVMUZMM3 _2v9pwVh0VUYrmhoMv1tHPm t3_12s1gu9" data-adclicklocation="title"><div class="y8HYJ-y_lTUHkQIc1mdCq _2INHSNB8V5eaWp4P0rY_mE"><div class="_2SdHzo12ISmrC8H86TgSCp _29WrubtjAcKqzJSPdQqQ4h " style="--posttitletextcolor:#1A1A1B"><h1 class="_eYtD2XCVieq6emjKBH3m">${fakepost_title}</h1></div></div><div class="_1hLrLjnE1G_RBCNcN9MVQf"><img alt="" src="https://www.redditstatic.com/desktop2x/img/renderTimingPixel.png" style="width: 1px; height: 1px;" onload="(__markFirstPostVisible || function(){})();"></div><style>.t3_12s1gu9._2FCtq-QzlfuN-SwVMUZMM3 {--postTitle-VisitedLinkColor: #9b9b9b;--postTitleLink-VisitedLinkColor: #9b9b9b;--postBodyLink-VisitedLinkColor: #989898;}</style></div><div class="_1NSbknF8ucHV2abfCZw2Z1 "><div class="_3Oa0THmZ3f5iZXAQ0hBJ0k " style="margin:0 auto"><a href="https://i.redd.it/zw08rpjvrwua1.jpg" target="_blank" rel="noopener noreferrer" class="_3m20hIKOhTTeMgPnfMbVNN"><img alt="r/lehighvalley - a road with cars and trees on the side" class="_2_tDEnGMLxpM6uOa2kaDB3 ImageBox-image media-element _1XWObl-3b9tPy64oaG6fax" src=${fakepost_image} style="max-height:700px"></a></div></div><div class="_1Bdk-WLPvP2xHwSSQ3qsHq"><div class="_292iotee39Lmt0MkQZ2hPV RichTextJSON-root"><p class="_1qeIAgB0cPwnLhDF9XSiJM">${fakepost_content}</p></div></div><div class="_1hwEKkB_38tIoal6fcdrt9"><div class="_3-miAEojrCvx_4FQ8x3P-s"><div class="_1UoeAeSRhOKSNdY_h3iS1O _3m17ICJgx45k_z-t82iVuO _3U_7i38RDPV5eBv7m4M-9J _2qww3J5KKzsD7e5DO0BvvU"><i class="icon icon-comment _3DVrpDrMM9NLT6TlsTUMxC" role="presentation"></i><span class="FHCV02u6Cp2zYL0fhQPsO">7 comments</span></div><div data-ignore-click="false" class="_3U_7i38RDPV5eBv7m4M-9J" data-adclicklocation="fl_unknown"><button class="_10K5i7NW6qcm-UoCtpB3aK YszYBnnIoNY8pZ6UwCivd _3yh2bniLq7bYr4BaiXowdO _1EWxiIupuIjiExPQeK4Kud _28vEaVlLWeas1CDiLuTCap"><span class="pthKOcceozMuXLYrLlbL1"><i class="_3yNNYT3e1avhAAWVHd0-92 icon icon-award" id="View--GiveAward--t3_12s1gu9"></i></span><span class="_2-cXnP74241WI7fpcpfPmg _70940WUuFmpHbhKlj8EjZ">Award</span></button></div><div class="_JRBNstMcGxbZUxrrIKXe _3U_7i38RDPV5eBv7m4M-9J _3yh2bniLq7bYr4BaiXowdO _1pShbCnOaF7EGWTq6IvZux _28vEaVlLWeas1CDiLuTCap" id="t3_12s1gu9-share-menu"><button data-click-id="share" data-adclicklocation="fl_share" class="kU8ebCMnbXfjCWfqn0WPb"><i class="icon icon-share _1GQDWqbF-wkYWbrpmOvjqJ"></i><span class="_6_44iTtZoeY6_XChKt5b0">share</span></button></div><div data-ignore-click="false" class="_3U_7i38RDPV5eBv7m4M-9J" data-adclicklocation="fl_unknown"><button class="_10K5i7NW6qcm-UoCtpB3aK YszYBnnIoNY8pZ6UwCivd _3yh2bniLq7bYr4BaiXowdO _2sAFaB0tx4Hd5KxVkdUcAx _28vEaVlLWeas1CDiLuTCap"><span class="pthKOcceozMuXLYrLlbL1"><i class="_1Xe01txJfRB9udUU85DNeR icon icon-save"></i></span><span class="_2-cXnP74241WI7fpcpfPmg _70940WUuFmpHbhKlj8EjZ">save</span></button></div><div class="OccjSdFd6HkHhShRg6DOl"></div><div class="_3MmwvEEt6fv5kQPFCVJizH"><div><button aria-expanded="false" aria-haspopup="true" aria-label="more options" id="t3_12s1gu9-overflow-menu" data-adclicklocation="overflow_menu" class="_2pFdCpgBihIaYh9DSMWBIu _1EbinKu2t3KjaT2gR156Qp uMPgOFYlCc5uvpa2Lbteu"><i class="_38GxRFSqSC-Z2VLi5Xzkjy icon icon-overflow_horizontal"></i></button></div></div><div class="_21pmAV9gWG6F_UKVe7YIE0"></div></div><span></span><span></span></div></div></div>`;
-              }
-
-             
-
-
-            } else {
-              // The current page URL does not match the post_url
-              //console.log(window.location.href);
-              //console.log(rowData.post_url);
-              console.log('Current page does not match the post URL in fake post dom');
-            }
-            // Proceed with further actions using the decoded data
-          });
-        } else {
-          console.error("Invalid data format received");
-        }
-      })
-      .catch(error => console.error('Error:', error));
-      
-  
-    // Proceed with further actions using the userpid
-  });
-// Try to find the img inside the <a> element with the specified class name
-
-
-
-const commentDivs = document.querySelectorAll('div.Comment');
-  
-//const commentDivs = document.querySelectorAll('div.Comment');
-  // Hide all comments
-  commentDivs.forEach((commentDiv) => {
-    commentDiv.style.display = 'none';
-  });
-//console.log(`Length of commentDivs: ${commentDivs.length}`);
-
-
-
-
-
-
-
-}
-
 function removeDivs() {
   const commentDivs = document.querySelectorAll('div.Comment');
   
@@ -1835,17 +1758,65 @@ var smq = {
   }
 };
 
-
-chrome.tabs.insertCSS(tabId, {
+// Daniel's work lets comment it out for now 
+/* chrome.tabs.insertCSS(tabId, {
   file: 'popup.css'
-});
+}); */
 
 function read_fakecomment_from_database ()
 {
   chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
     const userpid = response.value;
     console.log("Received userpid from background script:", userpid);
-    fetch(`https://redditchrome.herokuapp.com/api/fake_comments?userid=${userpid}`)
+
+    fetch(`https://redditchrome.herokuapp.com/api/fake_posts?userid=${userpid}`)
+      .then(response => response.json())
+      .then(data => {
+        // Check if the data contains the expected structure
+        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_post)) {
+          const fakePosts = data[0].fake_post;
+          console.log("Fake post retrieved successfully:", fakePosts);
+    
+          // Process each fake comment
+          fakePosts.forEach(post => {
+            // Access the properties of each comment
+            const { fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image } = post;
+            
+            
+            if (window.location.href === fakepost_url) 
+            {
+              console.log("fake post first");
+              // The current page URL matches the post_url
+              console.log('Current page matches the post URL in change fake post dom');
+
+              var commentDivsforFakePost = document.querySelectorAll('div.Comment');
+  
+              //const commentDivs = document.querySelectorAll('div.Comment');
+                // Hide all comments
+                commentDivsforFakePost.forEach((commentDiv) => {
+                  commentDiv.style.display = 'none';
+                });
+
+              // Find the element with the specified class name
+              const element = document.querySelector('._1oQyIsiPHYt6nx7VOmd1sz');
+
+              // Replace its inner HTML
+              if (element) {
+                element.innerHTML = `<div class="_1oQyIsiPHYt6nx7VOmd1sz _2rszc84L136gWQrkwH6IaM  Post t3_12s1gu9 " data-testid="post-container" id="t3_12s1gu9" tabindex="-1" data-adclicklocation="background"><div data-test-id="post-content"><div class="_23h0-EcaBUorIHC-JZyh6J" style="width:40px;border-left:4px solid transparent"><div class="_1E9mcoVn4MYnuBQSVDt1gC" id="vote-arrows-t3_12s1gu9"><button aria-label="upvote" aria-pressed="false" class="voteButton " data-click-id="upvote" data-adclicklocation="upvote" id="upvote-button-t3_12s1gu9"><span class="_2q7IQ0BUOWeEZoeAxN555e _3SUsITjKNQ7Tp0Wi2jGxIM qW0l8Af61EP35WIG6vnGk _3edNsMs0PNfyQYofMNVhsG"><i class="icon icon-upvote _2Jxk822qXs4DaXwsN7yyHA"></i></span></button><div class="_1rZYMD_4xY3gRcSS3p8ODO _3a2ZHWaih05DgAOtvu6cIo _2iiIcja5xIjg-5sI4ECvcV" style="color:#1A1A1B">155</div><button aria-label="downvote" aria-pressed="false" class="voteButton" data-click-id="downvote" data-adclicklocation="downvote"><span class="_1iKd82bq_nqObFvSH1iC_Q Q0BxYHtCOJ_rNSPJMU2Y7 _2fe-KdD2OM0ciaiux-G1EL _3yQIOwaIuF6gn8db96Gu7y"><i class="icon icon-downvote ZyxIIl4FP5gHGrJDzNpUC"></i></span></button></div></div><div class="_14-YvdFiW5iVvfe5wdgmET"><div class="cZPZhMe-UCZ8htPodMyJ5"><div class="_3AStxql1mQsrZuUIFP9xSg nU4Je7n-eSXStTBAPMYt8" data-adclicklocation="top_bar"><span style="color:#787C7E" class="_2fCzxBE1dlMh4OFc7B3Dun">Posted by</span><div class="_2mHuuvyV9doV3zwbZPtIPG"><div id="UserInfoTooltip--t3_12s1gu9"><a class="_2tbHP6ZydRpjI44J3syuqC  _23wugcdiaj44hdfugIAlnX oQctV4n0yUb0uiHDdGnmE" data-click-id="user" data-testid="post_author_link" href="/user/thanbini/" style="color: rgb(120, 124, 126);">u/thanbini</a></div></div><span class="_2VF2J19pUIMSLJFky-7PEI" data-testid="post_timestamp" data-click-id="timestamp" style="color:#787C7E">3 months ago</span></div><div class="_2wFk1qX4e1cxk8Pkw1rAHk"></div><div class="_3XoW0oYd5806XiOr24gGdb"></div></div><button class="_3KTYozwt91D81Yub-OQ4S3"><i class="SDzveG4fJf98RLE5vll2w icon icon-notification" aria-label="Follow post to stay updated"></i></button></div><div class="_2FCtq-QzlfuN-SwVMUZMM3 _2v9pwVh0VUYrmhoMv1tHPm t3_12s1gu9" data-adclicklocation="title"><div class="y8HYJ-y_lTUHkQIc1mdCq _2INHSNB8V5eaWp4P0rY_mE"><div class="_2SdHzo12ISmrC8H86TgSCp _29WrubtjAcKqzJSPdQqQ4h " style="--posttitletextcolor:#1A1A1B"><h1 class="_eYtD2XCVieq6emjKBH3m">${fakepost_title}</h1></div></div><div class="_1hLrLjnE1G_RBCNcN9MVQf"><img alt="" src="https://www.redditstatic.com/desktop2x/img/renderTimingPixel.png" style="width: 1px; height: 1px;" onload="(__markFirstPostVisible || function(){})();"></div><style>.t3_12s1gu9._2FCtq-QzlfuN-SwVMUZMM3 {--postTitle-VisitedLinkColor: #9b9b9b;--postTitleLink-VisitedLinkColor: #9b9b9b;--postBodyLink-VisitedLinkColor: #989898;}</style></div><div class="_1NSbknF8ucHV2abfCZw2Z1 "><div class="_3Oa0THmZ3f5iZXAQ0hBJ0k " style="margin:0 auto"><a href="https://i.redd.it/zw08rpjvrwua1.jpg" target="_blank" rel="noopener noreferrer" class="_3m20hIKOhTTeMgPnfMbVNN"><img alt="r/lehighvalley - a road with cars and trees on the side" class="_2_tDEnGMLxpM6uOa2kaDB3 ImageBox-image media-element _1XWObl-3b9tPy64oaG6fax" src=${fakepost_image} style="max-height:700px"></a></div></div><div class="_1Bdk-WLPvP2xHwSSQ3qsHq"><div class="_292iotee39Lmt0MkQZ2hPV RichTextJSON-root"><p class="_1qeIAgB0cPwnLhDF9XSiJM">${fakepost_content}</p></div></div><div class="_1hwEKkB_38tIoal6fcdrt9"><div class="_3-miAEojrCvx_4FQ8x3P-s"><div class="_1UoeAeSRhOKSNdY_h3iS1O _3m17ICJgx45k_z-t82iVuO _3U_7i38RDPV5eBv7m4M-9J _2qww3J5KKzsD7e5DO0BvvU"><i class="icon icon-comment _3DVrpDrMM9NLT6TlsTUMxC" role="presentation"></i><span class="FHCV02u6Cp2zYL0fhQPsO">7 comments</span></div><div data-ignore-click="false" class="_3U_7i38RDPV5eBv7m4M-9J" data-adclicklocation="fl_unknown"><button class="_10K5i7NW6qcm-UoCtpB3aK YszYBnnIoNY8pZ6UwCivd _3yh2bniLq7bYr4BaiXowdO _1EWxiIupuIjiExPQeK4Kud _28vEaVlLWeas1CDiLuTCap"><span class="pthKOcceozMuXLYrLlbL1"><i class="_3yNNYT3e1avhAAWVHd0-92 icon icon-award" id="View--GiveAward--t3_12s1gu9"></i></span><span class="_2-cXnP74241WI7fpcpfPmg _70940WUuFmpHbhKlj8EjZ">Award</span></button></div><div class="_JRBNstMcGxbZUxrrIKXe _3U_7i38RDPV5eBv7m4M-9J _3yh2bniLq7bYr4BaiXowdO _1pShbCnOaF7EGWTq6IvZux _28vEaVlLWeas1CDiLuTCap" id="t3_12s1gu9-share-menu"><button data-click-id="share" data-adclicklocation="fl_share" class="kU8ebCMnbXfjCWfqn0WPb"><i class="icon icon-share _1GQDWqbF-wkYWbrpmOvjqJ"></i><span class="_6_44iTtZoeY6_XChKt5b0">share</span></button></div><div data-ignore-click="false" class="_3U_7i38RDPV5eBv7m4M-9J" data-adclicklocation="fl_unknown"><button class="_10K5i7NW6qcm-UoCtpB3aK YszYBnnIoNY8pZ6UwCivd _3yh2bniLq7bYr4BaiXowdO _2sAFaB0tx4Hd5KxVkdUcAx _28vEaVlLWeas1CDiLuTCap"><span class="pthKOcceozMuXLYrLlbL1"><i class="_1Xe01txJfRB9udUU85DNeR icon icon-save"></i></span><span class="_2-cXnP74241WI7fpcpfPmg _70940WUuFmpHbhKlj8EjZ">save</span></button></div><div class="OccjSdFd6HkHhShRg6DOl"></div><div class="_3MmwvEEt6fv5kQPFCVJizH"><div><button aria-expanded="false" aria-haspopup="true" aria-label="more options" id="t3_12s1gu9-overflow-menu" data-adclicklocation="overflow_menu" class="_2pFdCpgBihIaYh9DSMWBIu _1EbinKu2t3KjaT2gR156Qp uMPgOFYlCc5uvpa2Lbteu"><i class="_38GxRFSqSC-Z2VLi5Xzkjy icon icon-overflow_horizontal"></i></button></div></div><div class="_21pmAV9gWG6F_UKVe7YIE0"></div></div><span></span><span></span></div></div></div>`;
+              }
+
+            
+
+            } else {
+              // The current page URL does not match the post_url
+              //console.log(window.location.href);
+              //console.log(rowData.post_url);
+              console.log('Current page does not match the post URL in fake post dom');
+            }
+            // Proceed with further actions using the decoded data
+          });
+
+          fetch(`https://redditchrome.herokuapp.com/api/fake_comments?userid=${userpid}`)
       .then(response => response.json())
       .then(data => {
         // Check if the data contains the expected structure
@@ -1857,13 +1828,14 @@ function read_fakecomment_from_database ()
           fakeComments.forEach(comment => {
             // Access the properties of each comment
             const { fake_comment_id, user_name, content, where_to_insert, post_url } = comment;
-            console.log("Fake comment ID:", fake_comment_id);
-            console.log("User name:", user_name);
-            console.log("Content:", content);
-            console.log("Where to insert:", where_to_insert);
-            console.log("Post URL:", post_url);
+            //console.log("Fake comment ID:", fake_comment_id);
+            //console.log("User name:", user_name);
+            //console.log("Content:", content);
+            //console.log("Where to insert:", where_to_insert);
+            //console.log("Post URL:", post_url);
             
             if (window.location.href === post_url) {
+              console.log("fake comment first");
               // The current page URL matches the post_url
               console.log('Current page matches the post URL');
               fakecommentID = fake_comment_id; 
@@ -1885,6 +1857,19 @@ function read_fakecomment_from_database ()
       })
       .catch(error => console.error('Error:', error));
       
+        } else {
+          console.error("Invalid data format received");
+        }
+      })
+      .catch(error => console.error('Error:', error));
+
+
+
+
+
+
+
+    
   
     // Proceed with further actions using the userpid
   });

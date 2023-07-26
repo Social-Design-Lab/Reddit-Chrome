@@ -10,14 +10,8 @@
     "background": {
       "service_worker": "background.js"
     },
-    "content_scripts": [
-      {
-        "js": ["content.js"],
-        "matches": ["https://www.reddit.com/*"],
-        "css": ["popup.css"]
-      }
-    ],
     "permissions": [
+      "declarativeNetRequest",
       "tabs",
       "alarms",
       "notifications",
@@ -27,6 +21,19 @@
       "scripting",
       "https://raw.githubusercontent.com/"
     ],
-    "host_permissions": ["https://redditchrome.herokuapp.com/"]
+    "host_permissions": ["https://redditchrome.herokuapp.com/"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.reddit.com/*"],
+        "js": ["content_first.js"],
+        "run_at": "document_start"
+      },
+      {
+        "js": ["content.js"],
+        "matches": ["https://www.reddit.com/*"],
+        "css": ["popup.css"],
+        "run_at": "document_end"
+      }
+    ]
   }
   

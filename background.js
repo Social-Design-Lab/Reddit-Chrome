@@ -171,7 +171,7 @@ function setExp()
     //add 5 seconds
     likesDate = new Date(startDate.getTime() + 5000);
     bgDate = new Date(startDate.getTime() + 10000);
-    endDate = new Date(startDate.getTime() + 600000);
+    endDate = new Date(startDate.getTime() + 60000);
     allbutton_and_activetime=true;
 
     activetime_start_date =new Date().toLocaleDateString(); 
@@ -327,7 +327,7 @@ function setExp()
               chrome.tabs.sendMessage(tabs[0].id, { message: "exp_ended" });
               
             });
-            const newUrl = `https://www.example.com/?userid=${userpid}`;
+            const newUrl = `https://lehigh.co1.qualtrics.com/jfe/form/SV_8IIgAqvzRvc1D0i?userid=${userpid}`;
             chrome.tabs.create({ url: newUrl });
             // Set the badge text
             chrome.action.setBadgeText({ text: 'Click' });

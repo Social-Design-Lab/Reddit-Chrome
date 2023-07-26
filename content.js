@@ -271,7 +271,7 @@ function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, comme
             childElement.textContent = parseInt(childElement.textContent) +1;
             // Perform any actions you need with the child element here
           } else {
-            alert("parent is not found");
+            //alert("parent is not found");
           }
         }
         //var uid = get_user_id_from_background();
@@ -293,7 +293,7 @@ function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, comme
             childElement.textContent = parseInt(childElement.textContent) +1;
             // Perform any actions you need with the child element here
           } else {
-            alert("parent is not found");
+            //alert("parent is not found");
           }
 
 
@@ -329,7 +329,7 @@ function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, comme
               childElement.textContent = parseInt(childElement.textContent) -1;
               // Perform any actions you need with the child element here
             } else {
-              alert("parent is not found");
+             // alert("parent is not found");
             }
             const currentUrl = window.location.href;
             console.log(`downvote button clicked for post: "${currentUrl}"`);
@@ -346,7 +346,7 @@ function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, comme
               childElement.textContent = parseInt(childElement.textContent) -1;
               // Perform any actions you need with the child element here
             } else {
-              alert("parent is not found");
+              //alert("parent is not found");
             }
             console.log(`downvote button clicked for post comment: "${text}"`);
             //send_data_to_background("downvote_comment", text);
@@ -655,7 +655,7 @@ upvoteButtons.addEventListener('click', function() {
             childElement.textContent = parseInt(childElement.textContent) +1;
             // Perform any actions you need with the child element here
           } else {
-            alert("parent is not found");
+            //alert("parent is not found");
           }
   
     upvoteButtons.setAttribute('data-listener-attached', 'true');
@@ -687,7 +687,7 @@ upvoteButtons.addEventListener('click', function() {
       if (likeButton) {
         if(!upvoteButtonvoteButtons.classList.contains(ButtonColorClass))
           {
-            alert("the number should icncreases ");
+            //alert("the number should icncreases ");
             likeButton.textContent = parseInt(likeButton.textContent) + 1;
           }
         else{
@@ -716,7 +716,7 @@ if (dislikebuttonSelector)
             childElement.textContent = parseInt(childElement.textContent) -1;
             // Perform any actions you need with the child element here
           } else {
-            alert("parent is not found");
+            //alert("parent is not found");
           }
       downvoteButtons.setAttribute('aria-pressed', 'true');
       
@@ -740,7 +740,7 @@ if (dislikebuttonSelector)
               childElement.textContent = parseInt(childElement.textContent) -1;
               // Perform any actions you need with the child element here
             } else {
-              alert("parent is not found");
+              //alert("parent is not found");
             }
           }
           //var uid = get_user_id_from_background();

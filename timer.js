@@ -132,7 +132,7 @@ function load() {
         hide("display");
         show("endexp");
         hide("midpop");
-        const newUrl = `https://www.example.com/?userid=${uid}`;
+        const newUrl = `https://lehigh.co1.qualtrics.com/jfe/form/SV_8IIgAqvzRvc1D0i?uid=${uid}`;
         // Get a reference to the link element
         const myLink = document.getElementById("my-link");
         // Change the href attribute of the link

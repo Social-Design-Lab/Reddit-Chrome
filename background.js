@@ -133,7 +133,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       console.log('userpid stored successfully.');
     });
     
+    function forceRefreshTab(tabId) {
+      chrome.tabs.reload(tabId);
+    }
 
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      if (tabs && tabs[0]) {
+        forceRefreshTab(tabs[0].id);
+      }
+    });
+
+    
     insertdata(userpid);
     read_csv(userpid);
     console.log(`Background Received user ID from timer js: ${message.userId}`);

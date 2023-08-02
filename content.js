@@ -977,7 +977,11 @@ const firstSubmitButtons = document.querySelector(replyPostButtonSelector);
                 if (!currentNode) {
                   console.log('No ancestor with textbox found');
                 }
-                console.log('My span:', currentNode.innerText);
+                console.log('My span: 2', currentNode.innerText);
+                //currentNode.innerText = '';
+
+                var spanElement = currentNode.querySelector("span[data-text='true']");
+spanElement.textContent = '';
                 //var uid =get_user_id_from_background();
                 const post_link =  window.location.href; 
                 //send_data_to_background("insert_comment", firstSubmitButtons.parentNode.parentNode.parentNode.innerText);
@@ -1024,7 +1028,7 @@ replyButtons.forEach(replyButton => {
                   }
                   currentNode = currentNode.parentNode;
                 }
-                    console.log('My span:', currentNode.innerText);
+                    console.log('My span: 1', currentNode.innerText);
 
                 let current = commentSubmitButtons;
                 while (current && !current.querySelector(commentSelector)) {
@@ -1856,12 +1860,106 @@ function read_fakecomment_from_database ()
                 //childElement.textContent = parseInt(childElement.textContent) +1;
               
 
-                // add event listener to the fake post dom page 
+                // disable the comment button on the top of the post 
+                var targetClassName = '._22S4OsoDdOqiM-hPTeOURa';
+
+                // Get the button element with the specified class name
+                var button = document.querySelector( targetClassName);
+
+                if (button) {
+                  // Button element found, you can use it here
+                var clonedButton = button.cloneNode(true);
+                
+
+                  button.parentNode.replaceChild(clonedButton, button);
+                  
 
 
-               
+// handle the input box is empty issue 
+
+function handleInput(event) {
+  var element = event.target;
+  if (element.innerText.trim() === '') {
+    console.log('Inner text is empty.');
+    clonedButton.disabled = true;
+    
+  } else {
+    console.log('Inner text is not empty:', element.innerText);
+
+    clonedButton.disabled = false;
+  }
+}
+
+var  targetClassName = '_13Sj3UMDKkCCJTq88berCB';
+                    var parent = clonedButton.parentNode;
+                    while (parent && !parent.querySelector(`.${targetClassName}`)) {
+                      parent = parent.parentNode;
+                    }
+
+                    if (parent) {
+                      // Found the nearest parent with the target class name
+                      var childElement = parent.querySelector(`.${targetClassName}`);
+
+                      // Add input event listener to the target element
+                      childElement.addEventListener('keyup', handleInput);
+                    }
 
 
+                
+
+
+                  clonedButton.addEventListener('click', function() {
+                    // Your event handler code here
+                    //console.log('Cloned button clicked!');
+                    var  targetClassName = '_13Sj3UMDKkCCJTq88berCB';
+                    var parent = clonedButton.parentNode;
+                    while (parent && !parent.querySelector(`.${targetClassName}`)) {
+                      parent = parent.parentNode;
+                    }
+
+                    if (parent) {
+                      // Found the nearest parent with the target class name
+                      var childElement = parent.querySelector(`.${targetClassName}`);
+
+                      //alert('Inner text of the element with class name:', childElement.innerText);
+                      if(childElement.innerText.trim()  !== '' ){
+
+console.log("do",childElement.innerText);
+                        fakecommentID = -1; 
+              fakeCommentInsertIndex = 0; 
+              fakeCommentUserName = document.querySelector("._2BMnTatQ5gjKGK5OWROgaG").innerText;; 
+              fakeCommnetContent = childElement.innerText; 
+
+              chrome.runtime.sendMessage({
+                message: "insert user reply in fake post to db",
+                commentId: fakecommentID,
+                userRedditName: fakeCommentUserName,
+                commentContent: fakeCommnetContent, 
+                insertindex: fakeCommentInsertIndex,
+                posturl: window.location.href,
+              }, function(response) {
+                // Handle the response from the background script if needed
+              }); 
+              //alert("should not pop up");
+             // childElement.textContent = '';
+                        insert_comment(fakecommentID, parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+                      
+                        clonedButton.disabled = true;
+                      
+                      
+                      }
+                    } else {
+                      //alert('Parent node with class name not found.');
+                    }
+                    //insert_comment(fakecommentID, parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+                  
+                  });
+                 
+
+
+                } else {
+                  console.log('Button not found in the DOM.');
+                }
 
 
               

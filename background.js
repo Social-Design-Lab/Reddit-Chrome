@@ -1,4 +1,5 @@
 
+
 var startDate ;
 var likesDate; 
 var bgDate; 
@@ -1260,4 +1261,28 @@ fetch('fakepost.csv')
 
 
 }
+
+// listen insert new insert , user reply to the fake post (not reply to fake comment)
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if ( message.message === 'insert user reply in fake post to db') {
+    // Extract the data from the message
+
+    var commentId = message.commentId;
+    var userRedditName = message.userRedditName;
+    var commentContent = message.commentContent;
+    var insertIndex = message.insertindex;
+    var posturl = message.posturl;
+
+    // Your logic to handle the received data goes here
+    // For example, you can call a function to insert the reply into the fake post
+    insertFakeComments(userpid, commentId, userRedditName, commentContent, insertIndex, posturl);
+
+    // Your logic to handle the received data goes here
+    // For example, you can insert the reply into the fake post in the desired format
+    // and save it to the database.
+
+    // If you need to send a response back to the background script, you can use sendResponse
+    // sendResponse({ response: 'Received the message successfully' });
+  }
+});
 

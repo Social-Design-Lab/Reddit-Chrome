@@ -1,46 +1,51 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         .btn-scale.active {
-          background-color: blue;
-          color: white;
+            background-color: blue;
+            color: white;
         }
-      </style>
+    </style>
     <title>Reddit Extension</title>
     <meta charset="utf-8">
-    <script src="timer.js"></script> 
+    <script src="timer.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container mt-3" style="width: 450px;">
         <div id="display" class="row-fluid">
-            <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and you will be asked to fill up a pop survey .  In 10 second you will see background color changes!!!After 10 minutes, the experiment will end and you can see the post survey link</p>
-              <!-- <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and you will be asked to fill up a pop survey .  In 10 second you will see background color changes!!!</p> -->
-              <div class="row" id="btnOptionsDiv">
-                <div class="col d-flex justify-content-end" >
-                <label id="lblHighlight" class="form-label me-3" >Change UI of the page?</label>
-                <select id="btnOptions" class="form-select" style="width: auto;" >
-                    <option>-- More --</option>
-                    <option value="options" selected disabled hidden>Options</option>
-                    <option value="highlight">Highlight</option>
-                    <option value="replaceContent">Replace content</option>
-                    <option value="hideCommentsEveryWhere">Hide comments everywhere</option>
-                    <option value="hideCommentsKeywords">Hide comments with keywords</option>
-                </select>
+            <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and
+                you will be asked to fill up a pop survey . In 10 second you will see background color changes!!!After
+                10 minutes, the experiment will end and you can see the post survey link</p>
+            <!-- <p id="timer">The experiment has started. In 5 second, you will see the all like number changes to 100 and you will be asked to fill up a pop survey .  In 10 second you will see background color changes!!!</p> -->
+            <div class="row" id="btnOptionsDiv">
+                <div class="col d-flex justify-content-end">
+                    <label id="lblHighlight" class="form-label me-3">Change UI of the page?</label>
+                    <select id="btnOptions" class="form-select" style="width: auto;">
+                        <option>-- More --</option>
+                        <option value="options" selected disabled hidden>Options</option>
+                        <option value="highlight">Highlight</option>
+                        <option value="replaceContent">Replace content</option>
+                        <option value="hideCommentsEveryWhere">Hide comments everywhere</option>
+                        <option value="hideCommentsKeywords">Hide comments with keywords</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col d-flex justify-content-end" id="highlightWindow">
-                <button class="btn btn-primary me-2" id="btnHighlight">Start</button>
-                <button class="btn btn-secondary" id="btnReset">Reset</button>   
+            <div class="row mt-3">
+                <div class="col d-flex justify-content-end" id="highlightWindow">
+                    <button class="btn btn-primary me-2" id="btnHighlight">Start</button>
+                    <button class="btn btn-secondary" id="btnReset">Reset</button>
+                </div>
             </div>
-        </div>
         </div>
         <div id="endexp" class="row-fluid">
-            <p >The experiment is end. A new tab for post-survey link has opened. If you close the tab accidently, Please right click the Post-survey below and open a new tab.  </p>
+            <p>The experiment is end. A new tab for post-survey link has opened. If you close the tab accidently, Please
+                right click the Post-survey below and open a new tab. </p>
             <a id="my-link" href="https://lehigh.co1.qualtrics.com/jfe/form/SV_8IIgAqvzRvc1D0i">Visit Post-survey</a>
-        
+
         </div>
         <div id="settings" class="row-fluid">
             <h2 class="text-center">Reddit Extension</h2>
@@ -57,38 +62,39 @@
             <div class="row">
                 <div class="col-xs-12">
                     <p class="page-header">1 is bad, 10 is good (i.e., "How happy are you feeling today?")</p>
-            <div class="chart-scale">
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-1">1</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-2">2</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-3">3</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-4">4</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-5">5</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-6">6</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-7">7</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-8">8</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-9">9</button>
-                <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-10">10</button>
-            </div>
-            <hr/>
-            <p class="page-header">How likely are you to do this experiment again (i.e. "1 least likely and 10 most likely")</p>
-            <div class="chart-scale">
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-1">1</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-2">2</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-3">3</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-4">4</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-5">5</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-6">6</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-7">7</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-8">8</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-9">9</button>
-                <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-10">10</button>
-            </div>
-                  
+                    <div class="chart-scale">
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-1">1</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-2">2</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-3">3</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-4">4</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-5">5</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-6">6</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-7">7</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-8">8</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-9">9</button>
+                        <button data-question-group="q1" class="q1 btn btn-scale btn-scale-desc-10">10</button>
+                    </div>
+                    <hr />
+                    <p class="page-header">How likely are you to do this experiment again (i.e. "1 least likely and 10
+                        most likely")</p>
+                    <div class="chart-scale">
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-1">1</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-2">2</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-3">3</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-4">4</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-5">5</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-6">6</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-7">7</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-8">8</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-9">9</button>
+                        <button data-question-group="q2" class="q2 btn btn-scale btn-scale-desc-10">10</button>
+                    </div>
+
                 </div>
-              </div>
-              <button type="submit" id="midpop-submit" class="btn btn-success" >Submit</button>
+            </div>
+            <button type="submit" id="midpop-submit" class="btn btn-success">Submit</button>
         </div>
     </div>
 </body>
-</html>
 
+</html>

@@ -1,39 +1,49 @@
 {
-    "manifest_version": 3,
-    "name": "Reddit COVID Project",
-    "version": "1.0",
-    "author": "Chenchen Mao",
-    "action":{
-        "default_popup": "index.html",
-        "default_title": "Reddit Extension"
-    } , 
-    "background": {
-      "service_worker": "background.js"
+  "manifest_version": 3,
+  "name": "Reddit COVID Project",
+  "version": "1.0",
+  "author": "Chenchen Mao",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Reddit Extension"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "declarativeNetRequest",
+    "tabs",
+    "alarms",
+    "notifications",
+    "activeTab",
+    "identity",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://redditchrome.herokuapp.com/"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.reddit.com/*"
+      ],
+      "js": [
+        "content_first.js"
+      ],
+      "run_at": "document_start"
     },
-    "permissions": [
-      "declarativeNetRequest",
-      "tabs",
-      "alarms",
-      "notifications",
-      "activeTab",
-      "identity",
-      "storage",
-      "scripting",
-      "https://raw.githubusercontent.com/"
-    ],
-    "host_permissions": ["https://redditchrome.herokuapp.com/"],
-    "content_scripts": [
-      {
-        "matches": ["https://www.reddit.com/*"],
-        "js": ["content_first.js"],
-        "run_at": "document_start"
-      },
-      {
-        "js": ["content.js"],
-        "matches": ["https://www.reddit.com/*"],
-        "css": ["popup.css"],
-        "run_at": "document_end"
-      }
-    ]
-  }
-  
+    {
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "https://www.reddit.com/*"
+      ],
+      "css": [
+        "popup.css"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}

@@ -1,19 +1,19 @@
 
 
-var startDate ;
-var likesDate; 
-var bgDate; 
+var startDate;
+var likesDate;
+var bgDate;
 let likeschange = false;
 var a = 1;
 var b = 2;
-let endexp =false;
-let userpid ;
-let likeschange1= false;
-let change_bgcolor = false; 
+let endexp = false;
+let userpid;
+let likeschange1 = false;
+let change_bgcolor = false;
 let change_bgcolor_condition2 = false;
 let allbutton_and_activetime = false;
-let activetime =0;
-let activetime_start_date =new Date().toLocaleDateString(); 
+let activetime = 0;
+let activetime_start_date = new Date().toLocaleDateString();
 // get the userpid from local storage 
 let survey;
 
@@ -106,33 +106,33 @@ chrome.storage.local.get(
 
 
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.url) {
     console.log("The tab URL has changed");
     if (changeInfo.url.includes("reddit.com")) {
       if (changeInfo.url.includes("/r/") || changeInfo.url.includes("/comments/")) {
         console.log("The URL is a post and we want to call content js ");
-        chrome.tabs.sendMessage(tabId, {message: "run_my_code"});
-      } 
+        chrome.tabs.sendMessage(tabId, { message: "run_my_code" });
+      }
       else {
-      console.log("The URL is the Reddit home page");
+        console.log("The URL is the Reddit home page");
       }
     }
   }
-  });
+});
 
 // Listen for messages from the popup script// store uid from index js 
 // Listen for messages from the popup script
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === "send_userid_from_timerjs" && message.userId) {
     // Do something with the user ID
     userpid = message.userId;
 
     // store the userpid on local so it does not disappear later
-    chrome.storage.local.set({ userpid: userpid }, function() {
+    chrome.storage.local.set({ userpid: userpid }, function () {
       console.log('userpid stored successfully.');
     });
-    
+
     function forceRefreshTab(tabId) {
       chrome.tabs.reload(tabId);
     }
@@ -143,7 +143,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
       }
     });
 
-    
+
     insertdata(userpid);
     read_csv(userpid);
     console.log(`Background Received user ID from timer js: ${message.userId}`);
@@ -151,19 +151,19 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 });
 
 //give all setup to content js when the experiment already started and user opened a new tab
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === "get_all_setup") {
-  sendResponse({
+    sendResponse({
 
-  likeschange1:likeschange1,
-  likeschange:likeschange,
-  change_bgcolor:change_bgcolor,
-  change_bgcolor_condition2:change_bgcolor_condition2,
-  allbutton_and_activetime:allbutton_and_activetime
+      likeschange1: likeschange1,
+      likeschange: likeschange,
+      change_bgcolor: change_bgcolor,
+      change_bgcolor_condition2: change_bgcolor_condition2,
+      allbutton_and_activetime: allbutton_and_activetime
 
-  });
+    });
   }
-  });
+});
 
 
 // generate random number between a and b (include a and b) 
@@ -175,244 +175,241 @@ function getRandomNumber(a, b) {
 let exp_cond = getRandomNumber(a, b);
 
 // setup alarm
-function setExp()
-{
-    //startDate = new Date(new Date().getTime()+(5*24*60*60*1000));
-    startDate = new Date();
-    //add 5 seconds
-    likesDate = new Date(startDate.getTime() + 5000);
-    bgDate = new Date(startDate.getTime() + 10000);
-    endDate = new Date(startDate.getTime() + 60000);
-    allbutton_and_activetime=true;
+function setExp() {
+  //startDate = new Date(new Date().getTime()+(5*24*60*60*1000));
+  startDate = new Date();
+  //add 5 seconds
+  likesDate = new Date(startDate.getTime() + 5000);
+  bgDate = new Date(startDate.getTime() + 10000);
+  endDate = new Date(startDate.getTime() + 60000);
+  allbutton_and_activetime = true;
 
-    activetime_start_date =new Date().toLocaleDateString(); 
+  activetime_start_date = new Date().toLocaleDateString();
 
-    chrome.storage.local.set({ activetime_start_date: activetime_start_date }, function() {
-      console.log('activetime_start_date stored successfully.');
-    });
-    chrome.storage.local.set({ allbutton_and_activetime: allbutton_and_activetime }, function() {
-      console.log('allbutton_and_activetime stored successfully.');
-    });
-    
-    // start the experiment(listening the upvote and downvote buttons)
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      if (tabs.length === 0) {
-        console.error("No active tabs found");
-        return;
-      }
-    
-      // Send a message to the content script
-      chrome.tabs.sendMessage(tabs[0].id, { message: "listen_buttons" });
-      chrome.tabs.sendMessage(tabs[0].id, { message: "newcomments_buttons" });
-    });
-    // change likes number
-    chrome.alarms.create("myAlarm", {
-        when: likesDate.getTime()
+  chrome.storage.local.set({ activetime_start_date: activetime_start_date }, function () {
+    console.log('activetime_start_date stored successfully.');
+  });
+  chrome.storage.local.set({ allbutton_and_activetime: allbutton_and_activetime }, function () {
+    console.log('allbutton_and_activetime stored successfully.');
+  });
+
+  // start the experiment(listening the upvote and downvote buttons)
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    if (tabs.length === 0) {
+      console.error("No active tabs found");
+      return;
+    }
+
+    // Send a message to the content script
+    chrome.tabs.sendMessage(tabs[0].id, { message: "listen_buttons" });
+    chrome.tabs.sendMessage(tabs[0].id, { message: "newcomments_buttons" });
+  });
+  // change likes number
+  chrome.alarms.create("myAlarm", {
+    when: likesDate.getTime()
+  });
+
+  chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (alarm.name === "myAlarm") {
+      survey = true;
+      chrome.storage.local.set({ survey: survey }, function () {
+        console.log('survey stored successfully.');
       });
-      
-      chrome.alarms.onAlarm.addListener(function(alarm) {
-        if (alarm.name === "myAlarm") {
-          survey = true; 
-              chrome.storage.local.set({ survey: survey }, function() {
-                console.log('survey stored successfully.');
-              });
-          // background.js
-            console.log("alarm goes on");
-          chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-            if (tabs.length === 0) {
-              console.error("No active tabs found");
-              if(exp_cond==1) {
-                //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
-                likeschange1 = true;
-                
-                chrome.storage.local.set({ likeschange1: likeschange1 }, function() {
-                  console.log('likeschange1 stored successfully.');
-                });
-              }
-              else{
-                //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
-                likeschange = true;
-                
-                chrome.storage.local.set({ likeschange: likeschange }, function() {
-                  console.log('likeschange stored successfully.');
-                });
-              }
-              
+      // background.js
+      console.log("alarm goes on");
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length === 0) {
+          console.error("No active tabs found");
+          if (exp_cond == 1) {
+            //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
+            likeschange1 = true;
 
-              return;
-            }
-           
-            // Send a message to the content script
-            if(exp_cond==1) {
-              chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
-              likeschange1 = true;
-              chrome.storage.local.set({ likeschange1: likeschange1 }, function() {
-                console.log('likeschange1 stored successfully.');
-              });
+            chrome.storage.local.set({ likeschange1: likeschange1 }, function () {
+              console.log('likeschange1 stored successfully.');
+            });
+          }
+          else {
+            //chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
+            likeschange = true;
 
-            }
-            else{
-              chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
-              likeschange = true;
-              chrome.storage.local.set({ likeschange: likeschange }, function() {
-                console.log('likeschange stored successfully.');
-              });
-            }
+            chrome.storage.local.set({ likeschange: likeschange }, function () {
+              console.log('likeschange stored successfully.');
+            });
+          }
+
+
+          return;
+        }
+
+        // Send a message to the content script
+        if (exp_cond == 1) {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes" });
+          likeschange1 = true;
+          chrome.storage.local.set({ likeschange1: likeschange1 }, function () {
+            console.log('likeschange1 stored successfully.');
           });
-         
-          
+
+        }
+        else {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "change_likes_condtion2" });
+          likeschange = true;
+          chrome.storage.local.set({ likeschange: likeschange }, function () {
+            console.log('likeschange stored successfully.');
+          });
         }
       });
-      // change background color 
-      chrome.alarms.create("bgAlarm", {
-        when: bgDate.getTime()
-      });
-      
-      chrome.alarms.onAlarm.addListener(function(alarm) {
-        if (alarm.name === "bgAlarm") {
-          // background.js
-            
-          chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-            if (tabs.length === 0) {
-              console.error("No active tabs found");
-              if(exp_cond==1) {
-                //chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
-                change_bgcolor =true;
-                chrome.storage.local.set({ change_bgcolor: change_bgcolor }, function() {
-                  console.log('change_bgcolor stored successfully.');
-                });
-                }
-                else
-                {
-                 // chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
-                  change_bgcolor_condition2 = true;
-                  chrome.storage.local.set({ change_bgcolor_condition2: change_bgcolor_condition2 }, function() {
-                    console.log('change_bgcolor_condition2 stored successfully.');
-                  });
-                }
-              return;
-            }
-          
-            // Send a message to the content script
-            if(exp_cond==1) {
-            chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
-            change_bgcolor =true;
-            chrome.storage.local.set({ change_bgcolor: change_bgcolor }, function() {
+
+
+    }
+  });
+  // change background color 
+  chrome.alarms.create("bgAlarm", {
+    when: bgDate.getTime()
+  });
+
+  chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (alarm.name === "bgAlarm") {
+      // background.js
+
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length === 0) {
+          console.error("No active tabs found");
+          if (exp_cond == 1) {
+            //chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
+            change_bgcolor = true;
+            chrome.storage.local.set({ change_bgcolor: change_bgcolor }, function () {
               console.log('change_bgcolor stored successfully.');
             });
-            
-            }
-            else
-            {
-              chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
-              change_bgcolor_condition2 = true;
-              chrome.storage.local.set({ change_bgcolor_condition2: change_bgcolor_condition2 }, function() {
-                console.log('change_bgcolor_condition2 stored successfully.');
-              });
-            }
+          }
+          else {
+            // chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
+            change_bgcolor_condition2 = true;
+            chrome.storage.local.set({ change_bgcolor_condition2: change_bgcolor_condition2 }, function () {
+              console.log('change_bgcolor_condition2 stored successfully.');
+            });
+          }
+          return;
+        }
+
+        // Send a message to the content script
+        if (exp_cond == 1) {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor" });
+          change_bgcolor = true;
+          chrome.storage.local.set({ change_bgcolor: change_bgcolor }, function () {
+            console.log('change_bgcolor stored successfully.');
           });
-         
-          
+
+        }
+        else {
+          chrome.tabs.sendMessage(tabs[0].id, { message: "change_bgcolor_condition2" });
+          change_bgcolor_condition2 = true;
+          chrome.storage.local.set({ change_bgcolor_condition2: change_bgcolor_condition2 }, function () {
+            console.log('change_bgcolor_condition2 stored successfully.');
+          });
         }
       });
 
-   // end of the experiment redirct to the post survey 
-      chrome.alarms.create("endAlarm", {
-        when: endDate.getTime()
+
+    }
+  });
+
+  // end of the experiment redirct to the post survey 
+  chrome.alarms.create("endAlarm", {
+    when: endDate.getTime()
+  });
+
+  chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (alarm.name === "endAlarm") {
+      endexp = true;
+      chrome.storage.local.set({ endexp: endexp }, function () {
+        console.log('endexp stored successfully.');
       });
-      
-      chrome.alarms.onAlarm.addListener(function(alarm) {
-        if (alarm.name === "endAlarm") {
-            endexp = true;
-            chrome.storage.local.set({ endexp: endexp }, function() {
-              console.log('endexp stored successfully.');
-            });
-            console.log("exp ended from background");
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-              if (tabs.length === 0) {
-                console.error("No active tabs found");
-                return;
-              }
-            
-              // Send a message to the content script
-              chrome.tabs.sendMessage(tabs[0].id, { message: "exp_ended" });
-              
-            });
-            const newUrl = `https://lehigh.co1.qualtrics.com/jfe/form/SV_8IIgAqvzRvc1D0i?userid=${userpid}`;
-            chrome.tabs.create({ url: newUrl });
-            // Set the badge text
-            chrome.action.setBadgeText({ text: 'Click' });
-
-            // Set the badge background color
-            chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
-
-
-            //moldapblhmdekbocbchgadlodkclkgke
-            // Delay for 30 seconds (in milliseconds)
-            const delayInMilliseconds = 86400000;
-
-            /////*********** uncomment in the experiment  */
-            // Call chrome.management.uninstallSelf() after the delay
-            /* setTimeout(() => {
-              chrome.management.uninstallSelf();
-            }, delayInMilliseconds);
- */         
+      console.log("exp ended from background");
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length === 0) {
+          console.error("No active tabs found");
+          return;
         }
-      });     
+
+        // Send a message to the content script
+        chrome.tabs.sendMessage(tabs[0].id, { message: "exp_ended" });
+
+      });
+      const newUrl = `https://lehigh.co1.qualtrics.com/jfe/form/SV_8IIgAqvzRvc1D0i?uid=${userpid}`;
+      chrome.tabs.create({ url: newUrl });
+      // Set the badge text
+      chrome.action.setBadgeText({ text: 'Click' });
+
+      // Set the badge background color
+      chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
 
 
-      
+      //moldapblhmdekbocbchgadlodkclkgke
+      // Delay for 30 seconds (in milliseconds)
+      const delayInMilliseconds = 86400000;
+
+      /////*********** uncomment in the experiment  */
+      // Call chrome.management.uninstallSelf() after the delay
+      /* setTimeout(() => {
+        chrome.management.uninstallSelf();
+      }, delayInMilliseconds);
+*/
+    }
+  });
+
+
+
 }
 
 // reponse start time to timer.js this is send response  
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.message === "get_time") {
-        sendResponse({value: startDate});
-      }
+  function (request, sender, sendResponse) {
+    if (request.message === "get_time") {
+      sendResponse({ value: startDate });
     }
-  );
+  }
+);
 
-  // end of the experiment 
-  chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.message === "end_exp") {
-        sendResponse({value: endexp});
-      }
+// end of the experiment 
+chrome.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+    if (request.message === "end_exp") {
+      sendResponse({ value: endexp });
     }
-  );
+  }
+);
 
 // return the uid to timer.js
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
+  function (request, sender, sendResponse) {
     if (request.message === "need_uid_from_backgroun") {
-      sendResponse({value: userpid});
-      console.log("recived request from timer js for uid: "+userpid);
+      sendResponse({ value: userpid });
+      console.log("recived request from timer js for uid: " + userpid);
     }
   }
 );
 
 // call background setExp function from timer.js this is send response 
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.message === "call_function") {
-        setExp();
-      }
+  function (request, sender, sendResponse) {
+    if (request.message === "call_function") {
+      setExp();
     }
-  );
+  }
+);
 
 // open db as the function name
 function openDB() {
-    openRequest.onsuccess = function() {
-      let db = openRequest.result;
-      console.log('Successfully opened database');
-  
-      // Your database operations here
-    };
-  
-    openRequest.onerror = function(error) {
-      console.error('Failed to open database:', error);
-    };
+  openRequest.onsuccess = function () {
+    let db = openRequest.result;
+    console.log('Successfully opened database');
+
+    // Your database operations here
+  };
+
+  openRequest.onerror = function (error) {
+    console.error('Failed to open database:', error);
+  };
 }
 
 
@@ -445,8 +442,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 ///// let's try connect with mongodb database
 
-function insertdata(uid)
-{
+function insertdata(uid) {
   //var insert_date=  new Date();
   fetch("https://redditchrome.herokuapp.com/api/insert", {
     method: "POST",
@@ -454,34 +450,34 @@ function insertdata(uid)
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      
+
       userid: uid,
-      user_vote_onPosts:[],
-      user_reply_onPosts:[],
-      user_vote_onComments:[],
-      user_reply_onComments:[],
-      browser_history:[],
-      active_onReddit:[], 
-      surveypopup_selections:[] ,
-      fake_post:[],
-      fake_comment:[],
-      user_reply_tofakecomment:[],
+      user_vote_onPosts: [],
+      user_reply_onPosts: [],
+      user_vote_onComments: [],
+      user_reply_onComments: [],
+      browser_history: [],
+      active_onReddit: [],
+      surveypopup_selections: [],
+      fake_post: [],
+      fake_comment: [],
+      user_reply_tofakecomment: [],
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert data");
-    }
-  })
-  .then(data => {
-    console.log("Data inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
-  
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert data");
+      }
+    })
+    .then(data => {
+      console.log("Data inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+
 }
 
 // insert user vote on Comments 
@@ -497,30 +493,30 @@ function insertUserVoteComments(uid, action, comment, post) {
       user_vote_onComments: [{
         action_date: insert_date,
         user_action: action,
-        action_comment: comment, 
+        action_comment: comment,
         action_post: post
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert user vote on comments ");
-    }
-  })
-  .then(data => {
-    console.log("User vote on comments inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert user vote on comments ");
+      }
+    })
+    .then(data => {
+      console.log("User vote on comments inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
 /// insert fake comments into database 
 
-function insertFakeComments(uid, comment_id, user_name, comment_content, insert_index,post_url) {
+function insertFakeComments(uid, comment_id, user_name, comment_content, insert_index, post_url) {
   const insert_date = new Date();
   fetch("https://redditchrome.herokuapp.com/api/updateFakeComment", {
     method: "POST",
@@ -532,25 +528,33 @@ function insertFakeComments(uid, comment_id, user_name, comment_content, insert_
       fake_comment: [{
         fake_comment_id: comment_id,
         user_name: user_name,
-        content: comment_content, 
+        content: comment_content,
         where_to_insert: insert_index,
-        post_url:post_url
+        post_url: post_url
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert fake comments on comments ");
-    }
-  })
-  .then(data => {
-    console.log("fake comments inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert fake comments on comments ");
+      }
+    })
+    .then(data => {
+      console.log("fake comments inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+
+      // Check if the error has a response
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response text:', error.response.statusText);
+      } else {
+        console.error('No response from server.');
+      }
+    });
 }
 
 
@@ -573,27 +577,27 @@ function insertFakePosts(uid, fakepost_url, fakepost_index, fakepost_title, fake
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert fake post");
-    }
-  })
-  .then(data => {
-    console.log("Fake post inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert fake post");
+      }
+    })
+    .then(data => {
+      console.log("Fake post inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === "insert user reply in fake comments to db") {
-    
+
     // Process the variables received from the content script
-    insertUserReplyFakeComments(userpid,request.commentId,  request.userRedditName,request.commentContent );
+    insertUserReplyFakeComments(userpid, request.commentId, request.userRedditName, request.commentContent);
     // Send a response back to the content script if needed
     sendResponse({ success: true });
   }
@@ -616,24 +620,24 @@ function insertUserReplyFakeComments(uid, comment_id, userRedditName, comment_co
       user_reply_tofakecomment: [{
         fake_comment_id: comment_id,
         userRedditName: userRedditName,
-        userReplyInFake: comment_content, 
-        
+        userReplyInFake: comment_content,
+
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert user reply to fake comments ");
-    }
-  })
-  .then(data => {
-    console.log("user reply fake comments inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert user reply to fake comments ");
+      }
+    })
+    .then(data => {
+      console.log("user reply fake comments inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
@@ -655,19 +659,19 @@ function insertUserReplyPosts(uid, content, post) {
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert user vote on comments ");
-    }
-  })
-  .then(data => {
-    console.log("User vote on comments inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert user vote on comments ");
+      }
+    })
+    .then(data => {
+      console.log("User vote on comments inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
@@ -688,24 +692,24 @@ function insertUserVotePosts(uid, action, post) {
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert user vote on Posts");
-    }
-  })
-  .then(data => {
-    console.log("User vote on posts inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert user vote on Posts");
+      }
+    })
+    .then(data => {
+      console.log("User vote on posts inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
 // insert the user action, reply a comments
-function insertUserReplyComments(uid, content,comment, post) {
+function insertUserReplyComments(uid, content, comment, post) {
   const insert_date = new Date();
   fetch("https://redditchrome.herokuapp.com/api/updateUserReply_Comments", {
     method: "POST",
@@ -722,19 +726,19 @@ function insertUserReplyComments(uid, content,comment, post) {
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert user vote on Posts");
-    }
-  })
-  .then(data => {
-    console.log("User vote on posts inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert user vote on Posts");
+      }
+    })
+    .then(data => {
+      console.log("User vote on posts inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
@@ -774,7 +778,7 @@ function insertBrowserHistory(uid, browserUrl) {
     });
 }
 // insert user active time on Reddit  
-function insertUserActive(uid,viewDate, total_time) {
+function insertUserActive(uid, viewDate, total_time) {
   const requestBody = {
     userid: uid,
     active_onReddit: [
@@ -823,32 +827,32 @@ function updateUserViewedPost(userid, post_url) {
       }]
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to update viewed post");
-    }
-  })
-  .then(data => {
-    console.log("User viewed post updated successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to update viewed post");
+      }
+    })
+    .then(data => {
+      console.log("User viewed post updated successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 // Listen for messages from the content script and send back userid 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   if (message.message === "get_user_id_frombackground") {
 
-      // Send the user ID back to the content script
-      sendResponse({ userId: userpid });
+    // Send the user ID back to the content script
+    sendResponse({ userId: userpid });
   }
 });
 
 // listen fro message from timder.js and send back userid 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === "timer_get_user_id") {
     // Get the user ID from storage or other sources
     sendResponse({ user_id: userpid });
@@ -856,7 +860,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // listen fro message from timder.js and send back survey time  
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === "survey_time") {
     // Get the user ID from storage or other sources
     sendResponse({ survey: survey });
@@ -864,28 +868,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // detect if user open new tab 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.url) {
-    if(userpid  != null && userpid != undefined)
-    {
-    console.log("URL changed to: " + changeInfo.url);
+    if (userpid != null && userpid != undefined) {
+      console.log("URL changed to: " + changeInfo.url);
 
-        // List of keywords to search for in the URL
-    const keywords = ['COVID19', 'virus'];
+      // List of keywords to search for in the URL
+      const keywords = ['COVID19', 'virus'];
 
-  
 
-    // Check if any of the keywords are present in the URL
-    const containsKeyword = keywords.some(keyword => changeInfo.url.includes(keyword));
 
-    if (containsKeyword) {
-      insertBrowserHistory(userpid,changeInfo.url);
-    } else {
-      // URL does not contain any of the keywords
-      // Perform alternative actions here
-    }
+      // Check if any of the keywords are present in the URL
+      const containsKeyword = keywords.some(keyword => changeInfo.url.includes(keyword));
 
-    
+      if (containsKeyword) {
+        insertBrowserHistory(userpid, changeInfo.url);
+      } else {
+        // URL does not contain any of the keywords
+        // Perform alternative actions here
+      }
+
+
     }
   }
 });
@@ -902,83 +905,81 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 //let activetime_start_date =new Date(); 
 //add 5 secondslet record_Date =  new Date(activetime_start_date.getTime() + 20000);
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === "active_time") {
-  console.log("Active time: " + request.activeTime );
-  if(activetime_start_date === new Date().toLocaleDateString() )
-  {
-    activetime=activetime+request.activeTime;
+    console.log("Active time: " + request.activeTime);
+    if (activetime_start_date === new Date().toLocaleDateString()) {
+      activetime = activetime + request.activeTime;
 
-    chrome.storage.local.set({ activetime: activetime }, function() {
-      console.log('activetime stored successfully.');
-    });
-    //insertUserActive(userpid,activetime ); 
-  }
-  else
-  {
-    console.log("a new date");
-    insertUserActive(userpid,activetime_start_date,activetime ); 
-    activetime=request.activeTime; 
-    chrome.storage.local.set({ activetime: activetime }, function() {
-      console.log('activetime stored successfully.');
-    });
-    activetime_start_date =new Date().toLocaleDateString(); 
-
-    chrome.storage.local.set({ activetime_start_date: activetime_start_date }, function() {
-      console.log('activetime_start_date stored successfully.');
-    });
-    //activetime_start_date =new Date(); 
-  }
-  }
-  });
-
-
-
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'changeSurveyValue') {
-      survey = message.newValue;
-      chrome.storage.local.set({ survey: survey }, function() {
-        console.log('survey stored successfully.');
+      chrome.storage.local.set({ activetime: activetime }, function () {
+        console.log('activetime stored successfully.');
       });
-
-      //console.log('Value updated to:', someValue);
+      //insertUserActive(userpid,activetime ); 
     }
-  });
+    else {
+      console.log("a new date");
+      insertUserActive(userpid, activetime_start_date, activetime);
+      activetime = request.activeTime;
+      chrome.storage.local.set({ activetime: activetime }, function () {
+        console.log('activetime stored successfully.');
+      });
+      activetime_start_date = new Date().toLocaleDateString();
 
-
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.message === "everything_for_timer") {
-      // Get the user ID from storage or other sources
-      const user_id = userpid; // Replace with appropriate code to get user_id
-  
-      // Get the survey value
-      const survey_value = survey; // Replace with appropriate code to get survey value
-  
-      // Get the end_exp value
-      const end_exp = endexp; // Replace with appropriate code to get end_exp value
-  
-      console.log("Sending response with user_id:", user_id, "survey:", survey_value, "end_exp:", end_exp);
-      sendResponse({ user_id: user_id, survey: survey_value, end_exp: end_exp });
+      chrome.storage.local.set({ activetime_start_date: activetime_start_date }, function () {
+        console.log('activetime_start_date stored successfully.');
+      });
+      //activetime_start_date =new Date(); 
     }
-  });
+  }
+});
 
 
-  function insertQuestiondata(q1selected, q2selected, uid) {
-    fetch("https://redditchrome.herokuapp.com/api/midpopup_select", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userid: uid,
-        surveypopup_selections: [
-          {
-            question1: q1selected,
-            question2: q2selected
-          }
-        ]
-      })
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'changeSurveyValue') {
+    survey = message.newValue;
+    chrome.storage.local.set({ survey: survey }, function () {
+      console.log('survey stored successfully.');
+    });
+
+    //console.log('Value updated to:', someValue);
+  }
+});
+
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.message === "everything_for_timer") {
+    // Get the user ID from storage or other sources
+    const user_id = userpid; // Replace with appropriate code to get user_id
+
+    // Get the survey value
+    const survey_value = survey; // Replace with appropriate code to get survey value
+
+    // Get the end_exp value
+    const end_exp = endexp; // Replace with appropriate code to get end_exp value
+
+    console.log("Sending response with user_id:", user_id, "survey:", survey_value, "end_exp:", end_exp);
+    sendResponse({ user_id: user_id, survey: survey_value, end_exp: end_exp });
+  }
+});
+
+
+function insertQuestiondata(q1selected, q2selected, uid) {
+  fetch("https://redditchrome.herokuapp.com/api/midpopup_select", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userid: uid,
+      surveypopup_selections: [
+        {
+          question1: q1selected,
+          question2: q2selected
+        }
+      ]
     })
+  })
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -992,17 +993,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     .catch(error => {
       console.error(error);
     });
-  }
+}
 
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("Message received in background.js:", message);
   if (message.message === "send_question_data_from_timerjs_chrome" && message.data.q1selected && message.data.q2selected) {
-      const q1selected = message.data.q1selected;
-      const q2selected = message.data.q2selected;
-      console.log("Received values:", q1selected, q2selected);
-      insertQuestiondata(q1selected, q2selected, userpid);
-      // Rest of your code...
+    const q1selected = message.data.q1selected;
+    const q2selected = message.data.q2selected;
+    console.log("Received values:", q1selected, q2selected);
+    insertQuestiondata(q1selected, q2selected, userpid);
+    // Rest of your code...
   }
 });
 
@@ -1014,7 +1015,7 @@ const KEYWORDS_JSON = 'https://raw.githubusercontent.com/wjy1919da/FirefoxExtens
 const SITES_JSON = 'https://raw.githubusercontent.com/wjy1919da/FirefoxExtensionDemo/main/lib/test_sites.json';
 const GLOBAL_DEFINITION_EXPIRATION_SEC = 86400;
 function getCurrentSeconds() {
-    return new Date().getTime() / 1000 | 0;
+  return new Date().getTime() / 1000 | 0;
 }
 
 
@@ -1042,77 +1043,77 @@ function getCurrentSeconds() {
 // MVCC
 // Get the latest site definitions.
 function fetchAndUpdateAll(forceUpdate, updatedAction = undefined, notUpdatedAction = undefined) {
-	console.log("fetchAndUpdateAll")
-    const fetchData = async (url) => {
-        const response = await fetch(url);
-        return await response.json();
-    };
+  console.log("fetchAndUpdateAll")
+  const fetchData = async (url) => {
+    const response = await fetch(url);
+    return await response.json();
+  };
 
-    const shouldUpdate = (lastUpdateTime) => {
-        return forceUpdate || !lastUpdateTime || getCurrentSeconds() - lastUpdateTime > GLOBAL_DEFINITION_EXPIRATION_SEC;
-    };
+  const shouldUpdate = (lastUpdateTime) => {
+    return forceUpdate || !lastUpdateTime || getCurrentSeconds() - lastUpdateTime > GLOBAL_DEFINITION_EXPIRATION_SEC;
+  };
 
-    chrome.storage.local.get(['keywords_last_update', 'sites_last_update'], (result) => {
-        const { keywords_last_update, sites_last_update } = result;
+  chrome.storage.local.get(['keywords_last_update', 'sites_last_update'], (result) => {
+    const { keywords_last_update, sites_last_update } = result;
 
-        if (shouldUpdate(keywords_last_update) || shouldUpdate(sites_last_update)) {
-            Promise.all([
-                fetchData(KEYWORDS_JSON),
-                fetchData(SITES_JSON)
-            ]).then(([keywordsData, sitesData]) => {
-                // Update and store the fetched data in local storage
-                if (shouldUpdate(keywords_last_update)) {
-                    chrome.storage.local.set({ 'global_keywordslist': JSON.stringify(keywordsData) });
-                    chrome.storage.local.set({ 'keywords_last_update': getCurrentSeconds() });
+    if (shouldUpdate(keywords_last_update) || shouldUpdate(sites_last_update)) {
+      Promise.all([
+        fetchData(KEYWORDS_JSON),
+        fetchData(SITES_JSON)
+      ]).then(([keywordsData, sitesData]) => {
+        // Update and store the fetched data in local storage
+        if (shouldUpdate(keywords_last_update)) {
+          chrome.storage.local.set({ 'global_keywordslist': JSON.stringify(keywordsData) });
+          chrome.storage.local.set({ 'keywords_last_update': getCurrentSeconds() });
 
-                    if (updatedAction) {
-                        updatedAction('keywords');
-                    }
-                }
-                if (shouldUpdate(sites_last_update)) {
-                    chrome.storage.local.set({ 'global_definitions': JSON.stringify(sitesData) });
-                    chrome.storage.local.set({ 'sites_last_update': getCurrentSeconds() });
-
-                    if (updatedAction) {
-                        updatedAction('definitions');
-                    }
-                }
-
-            }).catch((error) => {
-                console.error('Error fetching data:', error);
-
-                if (notUpdatedAction) {
-                    notUpdatedAction('keywords');
-                    notUpdatedAction('definitions');
-                }
-            });
-        } else {
-            if (notUpdatedAction) {
-                notUpdatedAction('keywords');
-                notUpdatedAction('definitions');
-            }
+          if (updatedAction) {
+            updatedAction('keywords');
+          }
         }
-    });
+        if (shouldUpdate(sites_last_update)) {
+          chrome.storage.local.set({ 'global_definitions': JSON.stringify(sitesData) });
+          chrome.storage.local.set({ 'sites_last_update': getCurrentSeconds() });
+
+          if (updatedAction) {
+            updatedAction('definitions');
+          }
+        }
+
+      }).catch((error) => {
+        console.error('Error fetching data:', error);
+
+        if (notUpdatedAction) {
+          notUpdatedAction('keywords');
+          notUpdatedAction('definitions');
+        }
+      });
+    } else {
+      if (notUpdatedAction) {
+        notUpdatedAction('keywords');
+        notUpdatedAction('definitions');
+      }
+    }
+  });
 }
 
 // Fires when a new browser tab is opened.
 // If it's time to check for new definitions, and there's an update available, retrieve them.
 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/onCreated
 chrome.tabs.onCreated.addListener(function () {
-    fetchAndUpdateAll(false);
+  fetchAndUpdateAll(false);
 });
 
 // Fires when addon is installed or updated.
 // Gets latest definitions.
 chrome.runtime.onInstalled.addListener(function (details) {
-    if (details.reason === 'install' || details.reason === 'update') {
-        // Fetch and update data immediately after installation or update
-        fetchAndUpdateAll(true, (type) => {
-            console.log(`${type} fetched and updated.`);
-        }, (type) => {
-            console.log(`No update needed or failed to fetch and update ${type}.`);
-        });
-    }
+  if (details.reason === 'install' || details.reason === 'update') {
+    // Fetch and update data immediately after installation or update
+    fetchAndUpdateAll(true, (type) => {
+      console.log(`${type} fetched and updated.`);
+    }, (type) => {
+      console.log(`No update needed or failed to fetch and update ${type}.`);
+    });
+  }
 });
 
 // sorted Map(need to update)
@@ -1168,105 +1169,104 @@ function insertQuestiondata(surveyObj, uid) {
     },
     body: JSON.stringify({
       userid: uid,
-      surveypopup_selections: 
+      surveypopup_selections:
         surveyObj
     })
   })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error("Failed to insert question data");
-    }
-  })
-  .then(data => {
-    console.log("Question data inserted successfully:", data);
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to insert question data");
+      }
+    })
+    .then(data => {
+      console.log("Question data inserted successfully:", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 }
 
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-console.log("Message received in background.js:", message);
-if (message.message === "send_question_data_from_timerjs") {
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  console.log("Message received in background.js:", message);
+  if (message.message === "send_question_data_from_timerjs") {
     console.log("Received values:", message.data);
     insertQuestiondata(message.data, userpid);
-}
+  }
 });
 
 
 
-function read_csv (userpid)
-{
+function read_csv(userpid) {
 
   // insert fake comments 
   fetch('fake_comment.csv')
-  .then(response => response.text())
-  .then(csvData => {
-    // Parse the CSV data
-    const rows = csvData.split('\n');
+    .then(response => response.text())
+    .then(csvData => {
+      // Parse the CSV data
+      const rows = csvData.split('\n');
       const headers = rows[0].split(',');
 
       for (let i = 1; i < rows.length; i++) {
         const values = rows[i].split(',');
 
-      // Create an object using the column names as keys
-      const rowData = {
-        fake_comment_id:values[0],
-        user_name: values[1],
-        content: values[2],
-        where_to_insert: values[3],
-        post_url: values[4].trim() 
-      };
-      
-      //alert(window.location.href ,rowData.post_url );
-      insertFakeComments(userpid, rowData.fake_comment_id,rowData.user_name,rowData.content,rowData.where_to_insert, rowData.post_url);
-      // Process the current row data
-      console.log(rowData);
+        // Create an object using the column names as keys
+        const rowData = {
+          fake_comment_id: values[0],
+          user_name: values[1],
+          content: values[2],
+          where_to_insert: values[3],
+          post_url: values[4].trim()
+        };
 
-      // You can perform any desired operations on rowData here
-    }
-  })
-  .catch(error => {
-    console.error('Error reading the CSV file:', error);
-  });
+        //alert(window.location.href ,rowData.post_url );
+        insertFakeComments(userpid, rowData.fake_comment_id, rowData.user_name, rowData.content, rowData.where_to_insert, rowData.post_url);
+        // Process the current row data
+        console.log("this is reading fake comments from csv ", rowData);
 
-
-// insert fake posts 
+        // You can perform any desired operations on rowData here
+      }
+    })
+    .catch(error => {
+      console.error('Error reading the CSV file:', error);
+    });
 
 
-fetch('fakepost.csv')
-  .then(response => response.text())
-  .then(csvData => {
-    // Parse the CSV data
-    const rows = csvData.split('\n');
+  // insert fake posts 
+
+
+  fetch('fakepost.csv')
+    .then(response => response.text())
+    .then(csvData => {
+      // Parse the CSV data
+      const rows = csvData.split('\n');
       const headers = rows[0].split(',');
 
       for (let i = 1; i < rows.length; i++) {
         const values = rows[i].split(',');
 
-      // Create an object using the column names as keys
-      const rowData = {
-        fakepost_url:values[0].trim() ,
-        fakepost_index: values[1],
-        fakepost_title: values[2],
-        fakepost_content: values[3],
-        fakepost_image: values[4].trim() 
-      };
-      
-      //alert(window.location.href ,rowData.post_url );
-      insertFakePosts(userpid, rowData.fakepost_url,rowData.fakepost_index,rowData.fakepost_title,rowData.fakepost_content, rowData.fakepost_image);
-      // Process the current row data
-      console.log(rowData);
+        // Create an object using the column names as keys
+        const rowData = {
+          fakepost_url: values[0].trim(),
+          fakepost_index: values[1],
+          fakepost_title: values[2],
+          fakepost_content: values[3],
+          fakepost_image: values[4].trim()
+        };
 
-      // You can perform any desired operations on rowData here
-    }
-  })
-  .catch(error => {
-    console.error('Error reading the CSV file:', error);
-  });
+        //alert(window.location.href ,rowData.post_url );
+        insertFakePosts(userpid, rowData.fakepost_url, rowData.fakepost_index, rowData.fakepost_title, rowData.fakepost_content, rowData.fakepost_image);
+        // Process the current row data
+        console.log(rowData);
+
+        // You can perform any desired operations on rowData here
+      }
+    })
+    .catch(error => {
+      console.error('Error reading the CSV file:', error);
+    });
 
 
 
@@ -1274,7 +1274,7 @@ fetch('fakepost.csv')
 
 // listen insert new insert , user reply to the fake post (not reply to fake comment)
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if ( message.message === 'insert user reply in fake post to db') {
+  if (message.message === 'insert user reply in fake post to db') {
     // Extract the data from the message
 
     var commentId = message.commentId;
@@ -1295,4 +1295,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     // sendResponse({ response: 'Received the message successfully' });
   }
 });
+
+
+
+// background.js
+
+// Function to handle URL changes
+
+
 

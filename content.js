@@ -1629,7 +1629,7 @@ function fakepost() {
             let elements = document.querySelector('.rpBJOHq2PR60pnwJlUyP0');
 
 
-            alert(fakepost_url);
+           // alert(fakepost_url);
 
             fakepost.addEventListener('click', function () {
               // Replace 'https://example.com' with the desired URL
@@ -2150,8 +2150,8 @@ function read_fakecomment_from_database() {
                       var i = span.querySelector('i');
                       
                       // Update class name of the i element
-                      i.classList.remove('icon-upvote_fill');
-                      i.classList.add('icon-upvote');
+                      i.classList.remove('icon-downvote_fill');
+                      i.classList.add('icon-downvote');
                     }
                     //console.log(upvoteButton);
                     upvoteButton.setAttribute('newbutton-clicked', 'true');
@@ -2321,7 +2321,7 @@ function read_fakecomment_from_database() {
 
 
                   clonedButton.addEventListener('click', function () {
-                    alert("check here");
+                    //alert("check here");
                     // Your event handler code here
                     //console.log('Cloned button clicked!');
                     var targetClassName = '_13Sj3UMDKkCCJTq88berCB';

@@ -459,8 +459,7 @@ function insertdata(uid) {
       browser_history: [],
       active_onReddit: [],
       surveypopup_selections: [],
-      fake_post: [],
-      fake_comment: [],
+      user_comment_in_fake_post: [],
       user_reply_tofakecomment: [],
     })
   })
@@ -518,14 +517,15 @@ function insertUserVoteComments(uid, action, comment, post) {
 
 function insertFakeComments(uid, comment_id, user_name, comment_content, insert_index, post_url) {
   const insert_date = new Date();
-  fetch("https://redditchrome.herokuapp.com/api/updateFakeComment", {
+  fetch("https://redditchrome.herokuapp.com/api/updateuserFakeComment_infakepost", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
       userid: uid,
-      fake_comment: [{
+      user_comment_in_fake_post
+: [{
         fake_comment_id: comment_id,
         user_name: user_name,
         content: comment_content,
@@ -1197,80 +1197,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   }
 });
 
-
-
-function read_csv(userpid) {
-
-  // insert fake comments 
-  fetch('fake_comment.csv')
-    .then(response => response.text())
-    .then(csvData => {
-      // Parse the CSV data
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-
-      for (let i = 1; i < rows.length; i++) {
-        const values = rows[i].split(',');
-
-        // Create an object using the column names as keys
-        const rowData = {
-          fake_comment_id: values[0],
-          user_name: values[1],
-          content: values[2],
-          where_to_insert: values[3],
-          post_url: values[4].trim()
-        };
-
-        //alert(window.location.href ,rowData.post_url );
-        insertFakeComments(userpid, rowData.fake_comment_id, rowData.user_name, rowData.content, rowData.where_to_insert, rowData.post_url);
-        // Process the current row data
-        console.log("this is reading fake comments from csv ", rowData);
-
-        // You can perform any desired operations on rowData here
-      }
-    })
-    .catch(error => {
-      console.error('Error reading the CSV file:', error);
-    });
-
-
-  // insert fake posts 
-
-
-  fetch('fakepost.csv')
-    .then(response => response.text())
-    .then(csvData => {
-      // Parse the CSV data
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-
-      for (let i = 1; i < rows.length; i++) {
-        const values = rows[i].split(',');
-
-        // Create an object using the column names as keys
-        const rowData = {
-          fakepost_url: values[0].trim(),
-          fakepost_index: values[1],
-          fakepost_title: values[2],
-          fakepost_content: values[3],
-          fakepost_image: values[4].trim()
-        };
-
-        //alert(window.location.href ,rowData.post_url );
-        insertFakePosts(userpid, rowData.fakepost_url, rowData.fakepost_index, rowData.fakepost_title, rowData.fakepost_content, rowData.fakepost_image);
-        // Process the current row data
-        console.log(rowData);
-
-        // You can perform any desired operations on rowData here
-      }
-    })
-    .catch(error => {
-      console.error('Error reading the CSV file:', error);
-    });
-
-
-
-}
 
 // listen insert new insert , user reply to the fake post (not reply to fake comment)
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {

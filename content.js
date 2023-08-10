@@ -243,6 +243,7 @@ function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, comme
   const upvoteButtons = document.querySelectorAll(likebuttonSelector);
   upvoteButtons.forEach((button) => {
     if (!button.getAttribute('data-listener-attached')) {
+      
       button.addEventListener('click', () => {
         //var post = button.parentNode.parentNode.parentNode.getElementsByClassName('_292iotee39Lmt0MkQZ2hPV');
         var post = findAncestorWithClass(button, commentTextClassName);
@@ -275,7 +276,8 @@ function listentobuttons(likebuttonSelector, dislikebuttonSelector = null, comme
                   childElement.textContent = parseInt(childElement.textContent) + 2;
                   parentElement.querySelector(dislikebuttonSelector).removeAttribute('button-clicked');
                   button.setAttribute('button-clicked', 'true');
-                }                
+                }   
+                     
 
               }
               else
@@ -1608,18 +1610,18 @@ function fakepost() {
     console.log("Received userpid from background script:", userpid);
 
 
-    fetch(`https://redditchrome.herokuapp.com/api/fake_posts?userid=${userpid}`)
+    fetch(`https://redditchrome.herokuapp.com/api/fake_posts`)
       .then(response => response.json())
       .then(data => {
         // Check if the data contains the expected structure
-        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_post)) {
-          const fakePosts = data[0].fake_post;
+        if (Array.isArray(data) && data.length > 0 ) {
+          var fakePosts = data;
           console.log("Fake post retrieved successfully:", fakePosts);
 
           // Process each fake comment
           fakePosts.forEach(post => {
             // Access the properties of each comment
-            const { fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image } = post;
+            var { id, fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image } = post;
 
 
             var fakepost = document.createElement("div");
@@ -1627,7 +1629,7 @@ function fakepost() {
             let elements = document.querySelector('.rpBJOHq2PR60pnwJlUyP0');
 
 
-
+            alert(fakepost_url);
 
             fakepost.addEventListener('click', function () {
               // Replace 'https://example.com' with the desired URL
@@ -2082,24 +2084,18 @@ var smq = {
 function read_fakecomment_from_database() {
 
 
-
-
-  chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
-    const userpid = response.value;
-    console.log("Received userpid from background script:", userpid);
-
-    fetch(`https://redditchrome.herokuapp.com/api/fake_posts?userid=${userpid}`)
+    fetch(`https://redditchrome.herokuapp.com/api/fake_posts`)
       .then(response => response.json())
       .then(data => {
         // Check if the data contains the expected structure
-        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_post)) {
-          const fakePosts = data[0].fake_post;
+        if (Array.isArray(data) && data.length > 0 ) {
+          const fakePosts = data;
           console.log("Fake post retrieved successfully:", fakePosts);
 
           // Process each fake comment
           fakePosts.forEach(post => {
-            // Access the properties of each comment
-            const { fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image } = post;
+            // Access the properties of each post
+            const { id, fakepost_url, fakepost_index, fakepost_title, fakepost_content, fakepost_image } = post;
 
 
             if (window.location.href === fakepost_url) {
@@ -2124,8 +2120,159 @@ function read_fakecomment_from_database() {
                 //var newbutton = element.getElementsByClassName(commentLikeclassName)[0];
                 //childElement.textContent = parseInt(childElement.textContent) +1;
 
+                var upvoteButton = element.querySelector('button[aria-label="upvote"]');
+                var downvoteButton = element.querySelector('button[aria-label="downvote"]');
+                var innerelement = element.querySelector('._1rZYMD_4xY3gRcSS3p8ODO._3a2ZHWaih05DgAOtvu6cIo._2iiIcja5xIjg-5sI4ECvcV');
+                upvoteButton.addEventListener('click', function() {
+                  
+                  // Your code for handling upvote button click here
+                  if (!upvoteButton.hasAttribute('newbutton-clicked')) 
+                  {
+                    //alert("not been clicked yet");
+                    if(!downvoteButton.hasAttribute('newbutton-clicked'))
+                    {
+                      innerelement.textContent = parseInt(innerelement.textContent) + 1;
+                    }
+                    else
+                    {
+                      innerelement.textContent = parseInt(innerelement.textContent) + 2;
+                      downvoteButton.removeAttribute('newbutton-clicked'); 
+                      downvoteButton.setAttribute('aria-pressed', 'false');
 
-                // disable the comment button on the top of the post 
+                      // Select the span element within the button
+                      var span = downvoteButton.querySelector('span');
+                      
+                      // Update class names of the span element
+                      span.classList.remove('Z3lT0VGlALek4Q9j0ZQCr');
+                      span.classList.add('_3edNsMs0PNfyQYofMNVhsG');
+                      
+                      // Select the i element within the span
+                      var i = span.querySelector('i');
+                      
+                      // Update class name of the i element
+                      i.classList.remove('icon-upvote_fill');
+                      i.classList.add('icon-upvote');
+                    }
+                    //console.log(upvoteButton);
+                    upvoteButton.setAttribute('newbutton-clicked', 'true');
+
+                    if (upvoteButton.hasAttribute('newbutton-clicked')) {
+                      console.log("Button attribute 'button-clicked' is set to 'true'");
+                    } else {
+                      console.log("Button attribute 'button-clicked' is not set");
+                    }
+
+                    
+                    //check the DOM for this
+                    upvoteButton.setAttribute('aria-pressed', 'true');
+
+                    //check to make sure this is set
+
+                    // Select the span element within the button
+                    var span = upvoteButton.querySelector('span');
+
+                    // Update class names of the span element
+                    span.classList.remove('_3edNsMs0PNfyQYofMNVhsG');
+                    span.classList.add('Z3lT0VGlALek4Q9j0ZQCr');
+
+                    // Select the i element within the span
+                    var i = span.querySelector('i');
+
+                    // Update class name of the i element
+                    i.classList.remove('icon-upvote');
+                    i.classList.add('icon-upvote_fill');
+                  }
+                  else
+                  {
+                    innerelement.textContent = parseInt(innerelement.textContent) - 1;
+                    upvoteButton.removeAttribute('newbutton-clicked'); 
+                    upvoteButton.setAttribute('aria-pressed', 'false');
+
+                      // Select the span element within the button
+                    var span = upvoteButton.querySelector('span');
+                      
+                      // Update class names of the span element
+                    span.classList.remove('Z3lT0VGlALek4Q9j0ZQCr');
+                    span.classList.add('_3edNsMs0PNfyQYofMNVhsG');
+                      
+                      // Select the i element within the span
+                    var i = span.querySelector('i');
+                      
+                      // Update class name of the i element
+                    i.classList.remove('icon-upvote_fill');
+                    i.classList.add('icon-upvote');
+                  }
+                });
+              
+                // Add event listener to the downvote button
+                downvoteButton.addEventListener('click', function() {
+                  downvoteButton.setAttribute("data-listener-attached","true");
+                    // Your code for handling downvote button click here
+                    if(!downvoteButton.hasAttribute('newbutton-clicked'))
+                    {
+                      if(!upvoteButton.hasAttribute('newbutton-clicked'))
+                      {
+                        innerelement.textContent = parseInt(innerelement.textContent) - 1;
+                      }
+                      else
+                      {
+                        innerelement.textContent = parseInt(innerelement.textContent) - 2;
+                        upvoteButton.removeAttribute('newbutton-clicked'); 
+                        upvoteButton.setAttribute('aria-pressed', 'false');
+  
+                        // Select the span element within the button
+                        var span = upvoteButton.querySelector('span');
+                        
+                        // Update class names of the span element
+                        span.classList.remove('Z3lT0VGlALek4Q9j0ZQCr');
+                        span.classList.add('_3edNsMs0PNfyQYofMNVhsG');
+                        
+                        // Select the i element within the span
+                        var i = span.querySelector('i');
+                        
+                        // Update class name of the i element
+                        i.classList.remove('icon-upvote_fill');
+                        i.classList.add('icon-upvote');
+                      }
+                      downvoteButton.setAttribute('newbutton-clicked', 'true');
+                      downvoteButton.setAttribute('aria-pressed', 'true');
+  
+                      // Select the span element within the button
+                      var span = downvoteButton.querySelector('span');
+  
+                      // Update class names of the span element
+                      span.classList.remove('_3edNsMs0PNfyQYofMNVhsG');
+                      span.classList.add('Z3lT0VGlALek4Q9j0ZQCr');
+  
+                      // Select the i element within the span
+                      var i = span.querySelector('i');
+  
+                      // Update class name of the i element
+                      i.classList.remove('icon-downvote');
+                      i.classList.add('icon-downvote_fill');
+                    }
+                    else
+                    {
+                      innerelement.textContent = parseInt(innerelement.textContent) + 1;
+                      downvoteButton.removeAttribute('newbutton-clicked'); 
+                      downvoteButton.setAttribute('aria-pressed', 'false');
+  
+                        // Select the span element within the button
+                      var span = downvoteButton.querySelector('span');
+                        
+                        // Update class names of the span element
+                      span.classList.remove('Z3lT0VGlALek4Q9j0ZQCr');
+                      span.classList.add('_3edNsMs0PNfyQYofMNVhsG');
+                        
+                        // Select the i element within the span
+                      var i = span.querySelector('i');
+                        
+                        // Update class name of the i element
+                      i.classList.remove('icon-downvote_fill');
+                      i.classList.add('icon-downvote');
+                    }
+                });
+                  // disable the comment button on the top of the post 
                 var targetClassName = '._22S4OsoDdOqiM-hPTeOURa';
 
                 // Get the button element with the specified class name
@@ -2174,6 +2321,7 @@ function read_fakecomment_from_database() {
 
 
                   clonedButton.addEventListener('click', function () {
+                    alert("check here");
                     // Your event handler code here
                     //console.log('Cloned button clicked!');
                     var targetClassName = '_13Sj3UMDKkCCJTq88berCB';
@@ -2190,9 +2338,9 @@ function read_fakecomment_from_database() {
                       if (childElement.innerText.trim() !== '') {
 
                         console.log("do", childElement.innerText);
-                        //var  userfakecommentID = -1; 
+                        var  usersfakecommentID = 0; 
                         const userfakeCommnetContent = childElement.innerText;
-                        fetch(`https://redditchrome.herokuapp.com/api/fake_comments?userid=${userpid}`)
+                        fetch(`https://redditchrome.herokuapp.com/api/fake_comments`)
                           .then(response => response.text())  // Get the response content as text
                           .then(responseText => {
                             console.log('Raw response content:', responseText);  // Log the raw response content
@@ -2200,21 +2348,36 @@ function read_fakecomment_from_database() {
                           })
                           .then(data => {
                             // Check if the data contains the expected structure
-                            if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_comment)) {
-                              var fakeComments = data[0].fake_comment;
-
+                            if (Array.isArray(data) && data.length > 0 ) {
+                              var fakeComments = data;
+                              chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
+                                const userpid = response.value;
+                                console.log("Received userpid from background script:", userpid);
+                        
+                              
                               // Get the length of the fetched data
-                              var userfakecommentID = fakeComments.length +1;
+                              usersfakecommentID = usersfakecommentID + fakeComments.length +1;
+                              console.log("first time :" ,usersfakecommentID);
+                              //console.log(`Length of fetched data: ${usersfakecommentID}`);
+                              fetch(`https://redditchrome.herokuapp.com/api/getuser_fake_comments_infakepost?userid=${userpid}`)
+                              .then(response => response.text())  // Get the response content as text
+                              .then(responseText => {
+                                console.log('Raw response content:', responseText);  // Log the raw response content
+                                return JSON.parse(responseText);  // Parse the response content as JSON
+                              })
+                              .then(data => {
+                                // Check if the data contains the expected structure
+                                if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].user_comment_in_fake_post)) {
+                                  var fakeComments = data[0].user_comment_in_fake_post;
+                                  
+                                  // Get the length of the fetched data
+                                  usersfakecommentID = usersfakecommentID +fakeComments.length +1;
+                                  console.log("second time: " , usersfakecommentID);
 
-                              console.log(`Length of fetched data: ${userfakecommentID}`);
-
-                              var userfakeCommentInsertIndex = 0;
-                              var userfakeCommentUserName = document.querySelector("._2BMnTatQ5gjKGK5OWROgaG").innerText;;
-                              // var userfakeCommnetContent = childElement.innerText; 
 
                               chrome.runtime.sendMessage({
                                 message: "insert user reply in fake post to db",
-                                commentId: userfakecommentID,
+                                commentId: usersfakecommentID,
                                 userRedditName: userfakeCommentUserName,
                                 commentContent: userfakeCommnetContent,
                                 insertindex: userfakeCommentInsertIndex,
@@ -2222,12 +2385,29 @@ function read_fakecomment_from_database() {
                               }, function (response) {
                                 // Handle the response from the background script if needed
                               });
+
+                              insert_comment(usersfakecommentID, userfakeCommentInsertIndex, userfakeCommentUserName, userfakeCommnetContent, parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+                                  // and perform any necessary actions.
+                                } else {
+                                  console.log('Fetched data is not in the expected structure.');
+                                }
+                              })
+                              .catch(error => {
+                                console.error('An error occurred while fetching data:', error);
+                              });
+                            });
+                              var userfakeCommentInsertIndex = 0;
+                              var userfakeCommentUserName = document.querySelector("._2BMnTatQ5gjKGK5OWROgaG").innerText;;
+                              // var userfakeCommnetContent = childElement.innerText; 
+
+                              
                               //alert("should not pop up");
                               // childElement.textContent = '';
                               console.log("comment content of reply fake post", childElement.innerText);
-                              insert_comment(userfakecommentID, userfakeCommentInsertIndex, userfakeCommentUserName, userfakeCommnetContent, parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+                              
 
                               clonedButton.disabled = true;
+
                               // Now you can proceed with your code using the fetched data
                               // For example, you can loop through the fakeComments array
                               // and perform any necessary actions.
@@ -2271,7 +2451,7 @@ function read_fakecomment_from_database() {
             // Proceed with further actions using the decoded data
           });
 
-          fetch(`https://redditchrome.herokuapp.com/api/fake_comments?userid=${userpid}`)
+          fetch(`https://redditchrome.herokuapp.com/api/fake_comments`)
             .then(response => response.text())  // Get the response content as text
             .then(responseText => {
               console.log('Raw response content:', responseText);  // Log the raw response content
@@ -2279,19 +2459,19 @@ function read_fakecomment_from_database() {
             })
             .then(data => {
               // Check if the data contains the expected structure
-              if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].fake_comment)) {
-                const fakeComments = data[0].fake_comment;
+              if (Array.isArray(data) && data.length > 0 ) {
+                const fakeComments = data;
                 console.log("Fake comments retrieved successfully:", fakeComments);
 
                 // Process each fake comment
                 fakeComments.forEach(comment => {
                   // Access the properties of each comment
-                  const { fake_comment_id, user_name, content, where_to_insert, post_url } = comment;
-                  //console.log("Fake comment ID:", fake_comment_id);
-                  //console.log("User name:", user_name);
-                  //console.log("Content:", content);
-                  //console.log("Where to insert:", where_to_insert);
-                  //console.log("Post URL:", post_url);
+                  const { id , fake_comment_id, user_name, content, where_to_insert, post_url } = comment;
+                  console.log("Fake comment ID:", fake_comment_id);
+                  console.log("User name:", user_name);
+                  console.log("Content:", content);
+                  console.log("Where to insert:", where_to_insert);
+                  console.log("Post URL:", post_url);
 
                   if (window.location.href === post_url) {
                     console.log("fake comment first");
@@ -2321,6 +2501,58 @@ function read_fakecomment_from_database() {
       })
       .catch(error => console.error('Error:', error));
 
+      // users comment reply to fake post 
+      chrome.runtime.sendMessage({ message: "need_uid_from_backgroun" }, function (response) {
+        const userpid = response.value;
+        console.log("Received userpid from background script:", userpid);
+
+      fetch(`https://redditchrome.herokuapp.com/api/getuser_fake_comments_infakepost?userid=${userpid}`)
+      .then(response => response.text())  // Get the response content as text
+      .then(responseText => {
+        console.log('Raw response content:', responseText);  // Log the raw response content
+        return JSON.parse(responseText);  // Parse the response content as JSON
+      })
+      .then(data => {
+        // Check if the data contains the expected structure
+        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0].user_comment_in_fake_post)) {
+          var fakeComments = data[0].user_comment_in_fake_post;
+
+          fakeComments.forEach(comment => {
+            // Access the properties of each comment
+            const { fake_comment_id, user_name, content, where_to_insert, post_url } = comment;
+            //console.log("Fake comment ID:", fake_comment_id);
+            //console.log("User name:", user_name);
+            //console.log("Content:", content);
+            //console.log("Where to insert:", where_to_insert);
+            //console.log("Post URL:", post_url);
+
+            if (window.location.href === post_url) {
+              console.log("fake comment first");
+              // The current page URL matches the post_url
+              console.log('Current page matches the post URL');
+
+              //fakeCommentUserName = user_name; 
+              //fakeCommnetContent = content; 
+              insert_comment(fake_comment_id, where_to_insert, user_name, content, parentContainer, likebuttonSelector, dislikebuttonSelector, ButtonColorClass, commentTextClassName, commentLikeclassName, replyCommentSelector);
+            } else {
+              // The current page URL does not match the post_url
+              //console.log(window.location.href);
+              //console.log(rowData.post_url);
+              console.log('Current page does not match the post URL');
+            }
+            // Proceed with further actions using the decoded data
+          });
+          // Now you can proceed with your code using the fetched data
+          // For example, you can loop through the fakeComments array
+          // and perform any necessary actions.
+        } else {
+          console.log('Fetched data is not in the expected structure.');
+        }
+      })
+      .catch(error => {
+        console.error('An error occurred while fetching data:', error);
+      });
+    });
 
 
 
@@ -2329,9 +2561,8 @@ function read_fakecomment_from_database() {
 
 
 
-    // Proceed with further actions using the userpid
-  });
 
+ 
   setTimeout(() => {
     document.documentElement.style.visibility = 'visible';
   }, 100); // Delay of 2000 milliseconds (2 seconds)
